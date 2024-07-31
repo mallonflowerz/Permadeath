@@ -13,7 +13,7 @@ config-version: 3
 # Elige el prefijo del plugin
 Prefix: '&cPermadeath &7➤ &f'
 # Si deseas activar baneos al morir alguien
-ban-enabled: true
+ban-enabled: false
 # Si deseas que un jugador sea baneado al no entrar al servidor por X tiempo.
 anti-afk-enabled: false
 AntiAFK:
@@ -31,23 +31,23 @@ Toggles:
   Netherite:
     # Probabilidad de Drop de Netherite
     # Escribe un número del 1 al 100.
-    Helmet: 10
-    Chestplate: 10
-    Leggings: 10
-    Boots: 10
+    Helmet: 20
+    Chestplate: 5
+    Leggings: 30
+    Boots: 15
   End:
     # ¿Cómo quieres que sea la Mob-Cap?
     # Más alto el número, mayores mobs
     # Por defecto: 70
-    Mob-Spawn-Limit: 70
+    Mob-Spawn-Limit: 80
     # ¿Uno de cada cuantos Endermans quieres que spawne un Ender Ghast?
     # Por defecto: 170
     # 1 de 170 endermans es un Ender Ghast
-    Ender-Ghast-Count: 170
+    Ender-Ghast-Count: 80
     # ¿Uno de cada cuantos Endermans quieres que spawne un Ender Creeper?
     # Por defecto: 20
     # 1 de 20 endermans es un Ender Creeper
-    Ender-Creeper-Count: 20
+    Ender-Creeper-Count: 15
     # ¿Deseas proteger el Spawn del End (0, 0) / ubicación del huevo?
     # Esto hará que la TNT del Permadeath Demon no haga daño aquí
     Protect-End-Spawn: false
@@ -59,8 +59,8 @@ Toggles:
       DisplayName: "&6&lPERMADEATH DEMON"
       DisplayNameEnraged: "&6&lENRAGED PERMADEATH DEMON"
       # ¿Cuánta vida deseas que tenga? (en HP)
-      Health: 2000
-      EnragedHealth: 600
+      Health: 1000 # Por jugador (5) legalmente serian 333
+      EnragedHealth: 333
       # ¿Quieres optimizar la TNT del PermadeathDemon?
       Optimizar-TNT: false
   # Configuración de The Beginning
@@ -69,13 +69,13 @@ Toggles:
   TheBeginning:
     # Este número es dividido entre 256 para indicar la probabilidad de que aparezca una ciudad en un chunk.
     # Para '100000' la probabilidad de un chunk de contener una ciudad es de 1/390
-    YticGenerateChance: 100000
+    YticGenerateChance: 80000
   # ¿Deseas que todos los mobs sean hostiles en el día +20?
   Hostile-Mobs: true
   # ¿Deseas que hayan cabezas de jugador al morir?
   Player-Skulls: true
   # ¿Deseas que los operadores también sean baneados al morir?
-  Op-Ban: true
+  Op-Ban: false
   # ¿Deseas que las arañas tengan efectos de poción?
   Spider-Effect: true
   # ¿Deseas activar el cambio polémico de Mikecrack en el día 60?
@@ -86,7 +86,7 @@ Toggles:
   Optimizar-Mob-Spawns: false
   # ¿Deseas doblar la mob-cap?
   # true = sí | false = no
-  Doble-Mob-Cap: false
+  Doble-Mob-Cap: true
   # !!! Esta opción no se recomienda en servidores poco potentes !!!
   # Cambia las entidades por nuevas.
   # Ejemplo: día 60 se carga un chunk con aldeanos y los reemplaza con vindicators.

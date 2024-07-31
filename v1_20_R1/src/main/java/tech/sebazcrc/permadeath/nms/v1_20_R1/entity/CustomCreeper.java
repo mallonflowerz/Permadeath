@@ -93,7 +93,8 @@ public class CustomCreeper extends Creeper {
             Vec3 vec3d = this.position();
             boolean flag2 = this.randomTeleport(d0, d1, d2, true);
             if (flag2) {
-                this.level().gameEvent(GameEvent.TELEPORT, vec3d, GameEvent.Context.of(this));
+                // GameEvent.Context.of(this)
+                this.level().gameEvent(GameEvent.TELEPORT, vec3d, null);
                 if (!this.isSilent()) {
                     this.level().playSound((Player)null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT, this.getSoundSource(), 1.0F, 1.0F);
                     this.playSound(SoundEvents.ENDERMAN_TELEPORT, 1.0F, 1.0F);

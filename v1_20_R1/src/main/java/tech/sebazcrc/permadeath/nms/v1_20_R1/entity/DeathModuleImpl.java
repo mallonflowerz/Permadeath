@@ -3,17 +3,11 @@ package tech.sebazcrc.permadeath.nms.v1_20_R1.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.MinecartSpawner;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.BaseSpawner;
-import net.minecraft.world.level.SpawnData;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -27,15 +21,12 @@ import org.bukkit.persistence.PersistentDataType;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.interfaces.DeathModule;
 
-import java.util.Optional;
-
 public class DeathModuleImpl implements DeathModule {
-    private static final int MODULE_HARM_EFFECT_LEVEL = 3;
 
     @Override
     public void spawn(Location where) {
         ServerLevel world = ((CraftWorld)where.getWorld()).getHandle();
-
+ 
         SpawnerMinecart bukkitSpawnerMinecart = where.getWorld().spawn(where, SpawnerMinecart.class);
         MinecartSpawner nmsSpawnerMinecart = (MinecartSpawner) ((CraftMinecart) bukkitSpawnerMinecart).getHandle();
         BaseSpawner nmsSpawner = nmsSpawnerMinecart.getSpawner();
@@ -73,6 +64,7 @@ public class DeathModuleImpl implements DeathModule {
 
         bukkitSpawnerMinecart.getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "module_minecart"), PersistentDataType.BYTE, (byte)1);
 
+                 
         CaveSpider spider = where.getWorld().spawn(where, CaveSpider.class);
         Shulker shulker = where.getWorld().spawn(where, Shulker.class);
         shulker.setColor(DyeColor.RED);

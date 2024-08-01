@@ -52,8 +52,8 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
     <craftbukkit.version>1.20.1-R0.1-SNAPSHOT</craftbukkit.version>
   </properties>
 </project>

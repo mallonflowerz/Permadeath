@@ -184,8 +184,8 @@ TheBeginning:
   # Este es un límite de donde aparecerá el portal a la dimensión.
   # Ejemplo 3000 x 3000
   # Este número también cuenta como negativo.
-  X-Limit: 3000
-  Z-Limit: 3000
+  X-Limit: 1500
+  Z-Limit: 1500
 # NO TOCAR
 DontTouch:
   PlayTime: 0

@@ -500,7 +500,7 @@ public class PlayerListener implements Listener {
             Main.instance.getShulkerEvent().addPlayer(e.getPlayer());
         }
 
-        Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
+        /* Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
             @Override
             public void run() {
                 if (!player.isOnline()) return;
@@ -523,7 +523,7 @@ public class PlayerListener implements Listener {
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 100.0F, 100.0F);
                 }
             }
-        }, 20 * 15);
+        }, 20 * 15); */
 
         Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
             @Override

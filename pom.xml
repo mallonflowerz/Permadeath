@@ -41,4 +41,34 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+     <!-- <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>tech.sebazcrc.permadeath:main</include>
+                                    <include>tech.sebazcrc.permadeath:api</include>
+                                    <include>tech.sebazcrc.permadeath:v1_15_R1</include>
+                                    <include>tech.sebazcrc.permadeath:v1_16_R3</include>
+                                    <include>tech.sebazcrc.permadeath:v1_20_R1</include>
+                                </includes>
+                            </artifactSet>
+                            <outputFile>${project.build.directory}/Permadeath-all.jar</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build> -->
 </project>

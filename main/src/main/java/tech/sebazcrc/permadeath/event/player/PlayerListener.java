@@ -530,10 +530,10 @@ public class PlayerListener implements Listener {
             public void run() {
                 if (player == null) return;
                 if (!player.isOnline()) return;
-                if (!player.hasPlayedBefore()) {
-                    player.sendTitle(TextUtils.format("&c&lPERMA&7&lDEATH"), TextUtils.format("&7Discord: &9https://discord.gg/8evPbuxPke"), 1, 20 * 5, 1);
-                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 100.0F, 100.0F);
-                }
+                // if (!player.hasPlayedBefore()) {
+                //     player.sendTitle(TextUtils.format("&c&lPERMA&7&lDEATH"), TextUtils.format("&7Discord: &9https://discord.gg/8evPbuxPke"), 1, 20 * 5, 1);
+                //     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 100.0F, 100.0F);
+                // }
 
                 if (player.isOp()) {
                     new UpdateChecker(Main.getInstance()).getVersion(version -> {

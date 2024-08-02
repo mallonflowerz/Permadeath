@@ -52,6 +52,7 @@ import tech.sebazcrc.permadeath.util.interfaces.NMSAccessor;
 import tech.sebazcrc.permadeath.util.interfaces.NMSHandler;
 import tech.sebazcrc.permadeath.task.EndTask;
 import tech.sebazcrc.permadeath.world.beginning.BeginningManager;
+import tech.sebazcrc.permadeath.world.ingame.DaysInGame;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -201,6 +202,7 @@ public final class Main extends JavaPlugin implements Listener {
                 }
 
                 DateManager.getInstance().tick();
+                DaysInGame.getInstance().tick();
                 registerListeners();
 
                 if (Bukkit.getOnlinePlayers().size() >= 1 && SPEED_RUN_MODE) {

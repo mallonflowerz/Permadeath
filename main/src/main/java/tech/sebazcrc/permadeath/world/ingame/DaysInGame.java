@@ -9,6 +9,7 @@ import org.bukkit.World;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.data.DateManager;
 import tech.sebazcrc.permadeath.data.PlayerDataManager;
+import tech.sebazcrc.permadeath.util.log.PDCLog;
 
 public class DaysInGame {
 
@@ -26,9 +27,10 @@ public class DaysInGame {
         World world = Bukkit.getWorld(main.getConfig().getString("Worlds.MainWorld"));
         long time = world.getFullTime();
 
-        long days = time / 24000;
+        long days = time / 48000;
         days = days + 1;
-        // Bukkit.getConsoleSender().sendMessage("Tiempo del juego, osea dia es: " + days + " time: " + time);
+        // Bukkit.getConsoleSender().sendMessage("Tiempo del juego, osea dia es: " +
+        // days + " time: " + time);
         return days;
     }
 
@@ -53,6 +55,8 @@ public class DaysInGame {
                 manager.setLastDay(DateManager.getInstance().getDay());
             }
         }
+
+        reloadConfig();
     }
 
     public void tick() {
@@ -69,5 +73,13 @@ public class DaysInGame {
         if (daysInGame == null)
             daysInGame = new DaysInGame();
         return daysInGame;
+    }
+
+    private void reloadConfig() {
+        main.setupConfig();
+        main.reloadConfig();
+        DateManager.getInstance().reloadDate();
+        main.setupWorld();
+        PDCLog.getInstance().log("Se ha recargado el plugin");
     }
 }

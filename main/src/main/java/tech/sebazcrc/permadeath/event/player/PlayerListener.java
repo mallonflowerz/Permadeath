@@ -98,8 +98,8 @@ public class PlayerListener implements Listener {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
 
-            String msg = Main.getInstance().getMessages().getMessage("DeathMessageChat", player).replace("%player%", victim);
-            player.sendMessage(msg);
+            // String msg = Main.getInstance().getMessages().getMessage("DeathMessageChat", player).replace("%player%", victim);
+            // player.sendMessage(msg);
 
             String ServerMessageTitle = Main.getInstance().getMessages().getMessage("DeathMessageTitle", player);
             String ServerMessageSubtitle = Main.getInstance().getMessages().getMessage("DeathMessageSubtitle", player);
@@ -229,16 +229,16 @@ public class PlayerListener implements Listener {
             Bukkit.broadcastMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "X: " + Dx + " || Y: " + Dy + " || Z: " + Dz + ChatColor.RESET);
         }
 
-        p.setGameMode(GameMode.SPECTATOR);
+        // p.setGameMode(GameMode.SPECTATOR);
         scheduler.runTaskLater(Main.instance, new Runnable() {
             @Override
             public void run() {
                 boolean isban = (doEnableOP ? !p.hasPermission("permadeathcore.banoverride") : true);
                 if (Main.instance.getConfig().getBoolean("ban-enabled") && isban) {
-                    if (off.isOnline()) {
-                        ((Player) off).kickPlayer(ChatColor.RED + "Has sido PERMABANEADO");
-                    }
-                    Bukkit.getBanList(BanList.Type.NAME).addBan(off.getName(), ChatColor.RED + "Has sido PERMABANEADO", null, "console");
+                    // if (off.isOnline()) {
+                    //     ((Player) off).kickPlayer(ChatColor.RED + "Has sido PERMABANEADO");
+                    // }
+                    // Bukkit.getBanList(BanList.Type.NAME).addBan(off.getName(), ChatColor.RED + "Has sido PERMABANEADO", null, "console");
                 }
             }
         }, 40L);
@@ -537,12 +537,12 @@ public class PlayerListener implements Listener {
 
                 if (player.isOp()) {
                     new UpdateChecker(Main.getInstance()).getVersion(version -> {
-                        if (Main.getInstance().getDescription().getVersion().equalsIgnoreCase(version)) {
-                            player.sendMessage(TextUtils.format(Main.prefix + "&3Estás utilizando la versión más reciente del Plugin."));
-                        } else {
-                            player.sendMessage(TextUtils.format(Main.prefix + "&3Se ha encontrado una nueva versión del Plugin"));
-                            player.sendMessage(TextUtils.format(Main.prefix + "&eDescarga en: &7" + Utils.SPIGOT_LINK));
-                        }
+                        // if (Main.getInstance().getDescription().getVersion().equalsIgnoreCase(version)) {
+                        //     player.sendMessage(TextUtils.format(Main.prefix + "&3Estás utilizando la versión más reciente del Plugin."));
+                        // } else {
+                        //     player.sendMessage(TextUtils.format(Main.prefix + "&3Se ha encontrado una nueva versión del Plugin"));
+                        //     player.sendMessage(TextUtils.format(Main.prefix + "&eDescarga en: &7" + Utils.SPIGOT_LINK));
+                        // }
                     });
                 }
             }

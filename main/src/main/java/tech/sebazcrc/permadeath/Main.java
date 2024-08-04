@@ -710,7 +710,7 @@ public final class Main extends JavaPlugin implements Listener {
         }
     }
 
-    protected String setupWorld() {
+    public String setupWorld() {
 
         if (Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.MainWorld"))) == null) {
 
@@ -832,7 +832,7 @@ public final class Main extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("pdc")).setTabCompleter(new PDCCommandCompleter());
     }
 
-    private void setupConfig() {
+    public void setupConfig() {
 
         File f = new File(getDataFolder(), "config.yml");
         FileConfiguration config = YamlConfiguration.loadConfiguration(f);

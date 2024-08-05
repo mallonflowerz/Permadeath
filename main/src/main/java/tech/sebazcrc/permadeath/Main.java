@@ -202,7 +202,7 @@ public final class Main extends JavaPlugin implements Listener {
                 }
 
                 DateManager.getInstance().tick();
-                DaysInGame.getInstance().tick();
+                // DaysInGame.getInstance().tick();
                 registerListeners();
 
                 if (Bukkit.getOnlinePlayers().size() >= 1 && SPEED_RUN_MODE) {

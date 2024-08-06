@@ -23,6 +23,8 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+
+import kotlin.random.Random;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.NMS;
 import tech.sebazcrc.permadeath.util.item.NetheriteArmor;
@@ -30,6 +32,7 @@ import tech.sebazcrc.permadeath.util.item.PermadeathItems;
 import tech.sebazcrc.permadeath.util.lib.ItemBuilder;
 import tech.sebazcrc.permadeath.util.lib.LeatherArmorBuilder;
 import tech.sebazcrc.permadeath.util.TextUtils;
+import tech.sebazcrc.permadeath.util.Utils;
 import tech.sebazcrc.permadeath.util.VersionManager;
 import tech.sebazcrc.permadeath.task.GatoGalacticoTask;
 

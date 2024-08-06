@@ -34,6 +34,7 @@ import tech.sebazcrc.permadeath.util.item.PermadeathItems;
 import tech.sebazcrc.permadeath.util.lib.HiddenStringUtils;
 import tech.sebazcrc.permadeath.util.lib.ItemBuilder;
 import tech.sebazcrc.permadeath.util.lib.UpdateChecker;
+import tech.sebazcrc.permadeath.data.DateManager;
 import tech.sebazcrc.permadeath.data.EndDataManager;
 import tech.sebazcrc.permadeath.data.PlayerDataManager;
 import tech.sebazcrc.permadeath.util.TextUtils;
@@ -50,6 +51,8 @@ public class PlayerListener implements Listener {
 
     long stormTicks;
     long stormHours;
+
+    private final int MAX_CRAFTS_PER_DAY = 15;
 
     public PlayerListener() {
         loadTicks();
@@ -98,7 +101,8 @@ public class PlayerListener implements Listener {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
 
-            String msg = Main.getInstance().getMessages().getMessage("DeathMessageChat", player).replace("%player%", victim);
+            String msg = Main.getInstance().getMessages().getMessage("DeathMessageChat", player).replace("%player%",
+                    victim);
             player.sendMessage(msg);
 
             String ServerMessageTitle = Main.getInstance().getMessages().getMessage("DeathMessageTitle", player);
@@ -118,7 +122,8 @@ public class PlayerListener implements Listener {
         int inc = (int) stormIncrement;
 
         boolean doEnableOP = Main.instance.getConfig().getBoolean("Toggles.OP-Ban");
-        //boolean causingProblems = (!doEnableOP ? !p.hasPermission("permadeathcore.banoverride") : true);
+        // boolean causingProblems = (!doEnableOP ?
+        // !p.hasPermission("permadeathcore.banoverride") : true);
         boolean causingProblems = true;
 
         if (!doEnableOP) {
@@ -161,13 +166,17 @@ public class PlayerListener implements Listener {
                     loadTicks();
                     if (Main.getInstance().getDay() < 50) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            String msg = Main.getInstance().getMessages().getMessage("DeathTrainMessage", p).replace("%tiempo%", String.valueOf(stormHours));
+                            String msg = Main.getInstance().getMessages().getMessage("DeathTrainMessage", p)
+                                    .replace("%tiempo%", String.valueOf(stormHours));
                             p.sendMessage(msg);
-                            if (Objects.requireNonNull(Main.instance.getConfig().getBoolean("Toggles.DefaultDeathSoundsEnabled")))
+                            if (Objects.requireNonNull(
+                                    Main.instance.getConfig().getBoolean("Toggles.DefaultDeathSoundsEnabled")))
                                 p.playSound(p.getLocation(), Sound.ENTITY_SKELETON_HORSE_DEATH, 10, 1);
                         }
-                        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("DeathTrainMessage").replace("%tiempo%", String.valueOf(stormHours)));
-                        DiscordPortal.onDeathTrain(Main.getInstance().getMessages().getMsgForConsole("DeathTrainMessage").replace("%tiempo%", String.valueOf(stormHours)));
+                        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages()
+                                .getMsgForConsole("DeathTrainMessage").replace("%tiempo%", String.valueOf(stormHours)));
+                        DiscordPortal.onDeathTrain(Main.getInstance().getMessages()
+                                .getMsgForConsole("DeathTrainMessage").replace("%tiempo%", String.valueOf(stormHours)));
                     } else {
                         long hours = stormTicks / 60 / 60;
                         long minutes = stormTicks / 60 % 60;
@@ -194,17 +203,21 @@ public class PlayerListener implements Listener {
 
                             String msg = Main.getInstance().getMessages().getMessage(path, p).replace("%tiempo%", time);
                             p.sendMessage(msg);
-                            if (Objects.requireNonNull(Main.instance.getConfig().getBoolean("Toggles.DefaultDeathSoundsEnabled")))
+                            if (Objects.requireNonNull(
+                                    Main.instance.getConfig().getBoolean("Toggles.DefaultDeathSoundsEnabled")))
                                 p.playSound(p.getLocation(), Sound.ENTITY_SKELETON_HORSE_DEATH, 10, 1);
                         }
 
-                        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole(path).replace("%tiempo%", time));
-                        DiscordPortal.onDeathTrain(Main.getInstance().getMessages().getMsgForConsole(path).replace("%tiempo%", time));
+                        Main.getInstance().getMessages().sendConsole(
+                                Main.getInstance().getMessages().getMsgForConsole(path).replace("%tiempo%", time));
+                        DiscordPortal.onDeathTrain(
+                                Main.getInstance().getMessages().getMsgForConsole(path).replace("%tiempo%", time));
                     }
                 }
             }, 100L);
         } else {
-            Bukkit.broadcastMessage(String.format(Main.instance.prefix + TextUtils.format("&eEl jugador &b" + p.getName() + " &eno puede dar más horas de tormenta.")));
+            Bukkit.broadcastMessage(String.format(Main.instance.prefix
+                    + TextUtils.format("&eEl jugador &b" + p.getName() + " &eno puede dar más horas de tormenta.")));
         }
 
         PlayerDataManager man = new PlayerDataManager(e.getEntity().getPlayer().getName(), Main.instance);
@@ -215,18 +228,22 @@ public class PlayerListener implements Listener {
         DiscordPortal.banPlayer(off, false);
 
         if (Main.instance.getConfig().contains("Server-Messages.CustomDeathMessages." + p.getName())) {
-            String msg = Main.instance.getConfig().getString("Server-Messages.CustomDeathMessages." + p.getName()).replace("%player%", p.getName());
+            String msg = Main.instance.getConfig().getString("Server-Messages.CustomDeathMessages." + p.getName())
+                    .replace("%player%", p.getName());
             Bukkit.broadcastMessage(TextUtils.format(StringUtils.capitalize(msg) + (msg.endsWith(".") ? "" : ".")));
         } else {
-            String msg = TextUtils.format(Main.instance.getConfig().getString("Server-Messages.DefaultDeathMessage").replace("%player%", p.getName()));
+            String msg = TextUtils.format(Main.instance.getConfig().getString("Server-Messages.DefaultDeathMessage")
+                    .replace("%player%", p.getName()));
             Bukkit.broadcastMessage(TextUtils.format(StringUtils.capitalize(msg) + (msg.endsWith(".") ? "" : ".")));
         }
-        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("DeathMessageChat").replace("%player%", victim));
+        Main.getInstance().getMessages().sendConsole(
+                Main.getInstance().getMessages().getMsgForConsole("DeathMessageChat").replace("%player%", victim));
         if (Main.instance.getConfig().getBoolean("Server-Messages.coords-msg-enable")) {
             int Dx = e.getEntity().getPlayer().getLocation().getBlockX();
             int Dy = e.getEntity().getPlayer().getLocation().getBlockY();
             int Dz = e.getEntity().getPlayer().getLocation().getBlockZ();
-            Bukkit.broadcastMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "X: " + Dx + " || Y: " + Dy + " || Z: " + Dz + ChatColor.RESET);
+            Bukkit.broadcastMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + "X: " + Dx + " || Y: " + Dy + " || Z: "
+                    + Dz + ChatColor.RESET);
         }
 
         p.setGameMode(GameMode.SPECTATOR);
@@ -238,7 +255,8 @@ public class PlayerListener implements Listener {
                     if (off.isOnline()) {
                         ((Player) off).kickPlayer(ChatColor.RED + "Has sido PERMABANEADO");
                     }
-                    Bukkit.getBanList(BanList.Type.NAME).addBan(off.getName(), ChatColor.RED + "Has sido PERMABANEADO", null, "console");
+                    Bukkit.getBanList(BanList.Type.NAME).addBan(off.getName(), ChatColor.RED + "Has sido PERMABANEADO",
+                            null, "console");
                 }
             }
         }, 40L);
@@ -330,11 +348,13 @@ public class PlayerListener implements Listener {
             if (Main.getInstance().getDay() >= 50) {
                 if (new SplittableRandom().nextInt(100) + 1 <= 10) {
 
-                    event.getPlayer().sendMessage(TextUtils.format(Main.prefix + " &aHas restablecido el contador de Phantoms."));
+                    event.getPlayer().sendMessage(
+                            TextUtils.format(Main.prefix + " &aHas restablecido el contador de Phantoms."));
                     event.getPlayer().setStatistic(Statistic.TIME_SINCE_REST, 0);
                 }
             } else {
-                event.getPlayer().sendMessage(TextUtils.format(Main.prefix + " &aHas restablecido el contador de Phantoms."));
+                event.getPlayer()
+                        .sendMessage(TextUtils.format(Main.prefix + " &aHas restablecido el contador de Phantoms."));
                 event.getPlayer().setStatistic(Statistic.TIME_SINCE_REST, 0);
             }
 
@@ -354,7 +374,8 @@ public class PlayerListener implements Listener {
 
         if (Bukkit.getOnlinePlayers().size() < neededPlayers) {
 
-            player.sendMessage(TextUtils.format("&cNo puedes dormir porque no hay suficientes personas en línea (" + neededPlayers + ")."));
+            player.sendMessage(TextUtils
+                    .format("&cNo puedes dormir porque no hay suficientes personas en línea (" + neededPlayers + ")."));
             event.setCancelled(true);
             return;
         }
@@ -380,17 +401,20 @@ public class PlayerListener implements Listener {
 
                     if (!sent.contains(player)) {
 
-                        //Bukkit.broadcastMessage(instance.format(Objects.requireNonNull(instance.getConfig().getString("Server-Messages.Sleep").replace("%player%", player.getName()))));
+                        // Bukkit.broadcastMessage(instance.format(Objects.requireNonNull(instance.getConfig().getString("Server-Messages.Sleep").replace("%player%",
+                        // player.getName()))));
 
                         Bukkit.getOnlinePlayers().forEach(p -> {
 
-                            String msg = Main.getInstance().getMessages().getMessage("Sleep", p).replace("%player%", player.getName());
+                            String msg = Main.getInstance().getMessages().getMessage("Sleep", p).replace("%player%",
+                                    player.getName());
 
                             p.sendMessage(msg);
 
                         });
 
-                        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("Sleep").replace("%player%", player.getName()));
+                        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages()
+                                .getMsgForConsole("Sleep").replace("%player%", player.getName()));
 
                         sent.add(player);
                         player.damage(0.1);
@@ -405,13 +429,18 @@ public class PlayerListener implements Listener {
 
             Bukkit.getOnlinePlayers().forEach(p -> {
 
-                String msg = Main.getInstance().getMessages().getMessage("Sleeping", p).replace("%needed%", String.valueOf(4)).replace("%players%", String.valueOf(globalSleeping.size())).replace("%player%", player.getName());
+                String msg = Main.getInstance().getMessages().getMessage("Sleeping", p)
+                        .replace("%needed%", String.valueOf(4))
+                        .replace("%players%", String.valueOf(globalSleeping.size()))
+                        .replace("%player%", player.getName());
 
                 p.sendMessage(msg);
 
             });
 
-            Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("Sleeping").replace("%needed%", String.valueOf(4)).replace("%players%", String.valueOf(globalSleeping.size())).replace("%player%", player.getName()));
+            Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("Sleeping")
+                    .replace("%needed%", String.valueOf(4)).replace("%players%", String.valueOf(globalSleeping.size()))
+                    .replace("%player%", player.getName()));
 
             if (globalSleeping.size() >= neededPlayers && globalSleeping.size() < Bukkit.getOnlinePlayers().size()) {
 
@@ -428,7 +457,9 @@ public class PlayerListener implements Listener {
 
                                     all.setStatistic(Statistic.TIME_SINCE_REST, 0);
                                     all.damage(0.1);
-                                    Bukkit.broadcastMessage(TextUtils.format(Objects.requireNonNull(Main.instance.getConfig().getString("Server-Messages.Sleep").replace("%player%", all.getName()))));
+                                    Bukkit.broadcastMessage(TextUtils.format(Objects
+                                            .requireNonNull(Main.instance.getConfig().getString("Server-Messages.Sleep")
+                                                    .replace("%player%", all.getName()))));
                                 }
                             }
 
@@ -446,7 +477,8 @@ public class PlayerListener implements Listener {
                 for (Player all : Bukkit.getOnlinePlayers()) {
                     all.setStatistic(Statistic.TIME_SINCE_REST, 0);
                     all.damage(0.1);
-                    Bukkit.broadcastMessage(TextUtils.format(Objects.requireNonNull(Main.instance.getConfig().getString("Server-Messages.Sleep").replace("%player%", all.getName()))));
+                    Bukkit.broadcastMessage(TextUtils.format(Objects.requireNonNull(Main.instance.getConfig()
+                            .getString("Server-Messages.Sleep").replace("%player%", all.getName()))));
                 }
 
                 Bukkit.broadcastMessage(TextUtils.format("&eHan dormido todos los jugadores."));
@@ -490,11 +522,13 @@ public class PlayerListener implements Listener {
 
         e.setJoinMessage(null);
         Bukkit.getOnlinePlayers().forEach(p -> {
-            String JoinMessage = Main.getInstance().getMessages().getMessage("OnJoin", p).replace("%player%", e.getPlayer().getName());
+            String JoinMessage = Main.getInstance().getMessages().getMessage("OnJoin", p).replace("%player%",
+                    e.getPlayer().getName());
             p.sendMessage(JoinMessage);
         });
 
-        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("OnJoin").replace("%player%", player.getName()));
+        Main.getInstance().getMessages().sendConsole(
+                Main.getInstance().getMessages().getMsgForConsole("OnJoin").replace("%player%", player.getName()));
 
         if (Main.instance.getShulkerEvent().isRunning()) {
             Main.instance.getShulkerEvent().addPlayer(e.getPlayer());
@@ -503,7 +537,8 @@ public class PlayerListener implements Listener {
         Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
             @Override
             public void run() {
-                if (!player.isOnline()) return;
+                if (!player.isOnline())
+                    return;
 
                 player.sendMessage(TextUtils.format("&e&m-------------------------------------------"));
                 player.sendMessage(TextUtils.format("        &c&lPERMA&7&lDEATH"));
@@ -515,11 +550,14 @@ public class PlayerListener implements Listener {
                 player.sendMessage(TextUtils.format("&9" + Utils.DISCORD_LINK));
                 player.sendMessage(TextUtils.format("&e&m-------------------------------------------"));
                 if (!Main.optifineItemsEnabled())
-                    player.sendMessage(TextUtils.format("&cRecuerda aceptar los paquetes de Recursos para ver los ítems y texturas personalizadas."));
-                player.sendMessage(Main.prefix + TextUtils.format("&eEjecuta el comando &f&l/pdc &r&epara más información."));
+                    player.sendMessage(TextUtils.format(
+                            "&cRecuerda aceptar los paquetes de Recursos para ver los ítems y texturas personalizadas."));
+                player.sendMessage(
+                        Main.prefix + TextUtils.format("&eEjecuta el comando &f&l/pdc &r&epara más información."));
 
                 if (!player.hasPlayedBefore()) {
-                    player.sendTitle(TextUtils.format("&c&lPERMA&7&lDEATH"), TextUtils.format("&7Desarrollador: &b@SebazCRC"), 1, 20 * 5, 1);
+                    player.sendTitle(TextUtils.format("&c&lPERMA&7&lDEATH"),
+                            TextUtils.format("&7Desarrollador: &b@SebazCRC"), 1, 20 * 5, 1);
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 100.0F, 100.0F);
                 }
             }
@@ -528,19 +566,24 @@ public class PlayerListener implements Listener {
         Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
             @Override
             public void run() {
-                if (player == null) return;
-                if (!player.isOnline()) return;
+                if (player == null)
+                    return;
+                if (!player.isOnline())
+                    return;
                 if (!player.hasPlayedBefore()) {
-                    player.sendTitle(TextUtils.format("&c&lPERMA&7&lDEATH"), TextUtils.format("&7Discord: &9https://discord.gg/8evPbuxPke"), 1, 20 * 5, 1);
+                    player.sendTitle(TextUtils.format("&c&lPERMA&7&lDEATH"),
+                            TextUtils.format("&7Discord: &9https://discord.gg/8evPbuxPke"), 1, 20 * 5, 1);
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 100.0F, 100.0F);
                 }
 
                 if (player.isOp()) {
                     new UpdateChecker(Main.getInstance()).getVersion(version -> {
                         if (Main.getInstance().getDescription().getVersion().equalsIgnoreCase(version)) {
-                            player.sendMessage(TextUtils.format(Main.prefix + "&3Estás utilizando la versión más reciente del Plugin."));
+                            player.sendMessage(TextUtils
+                                    .format(Main.prefix + "&3Estás utilizando la versión más reciente del Plugin."));
                         } else {
-                            player.sendMessage(TextUtils.format(Main.prefix + "&3Se ha encontrado una nueva versión del Plugin"));
+                            player.sendMessage(
+                                    TextUtils.format(Main.prefix + "&3Se ha encontrado una nueva versión del Plugin"));
                             player.sendMessage(TextUtils.format(Main.prefix + "&eDescarga en: &7" + Utils.SPIGOT_LINK));
                         }
                     });
@@ -551,8 +594,10 @@ public class PlayerListener implements Listener {
         if (!Main.optifineItemsEnabled())
             player.setResourcePack(Utils.RESOURCE_PACK_LINK);
 
-        if (Main.instance.getBeginningManager() != null && Main.instance.getBeginningManager().getBeginningWorld() != null) {
-            if (Main.instance.getBeginningManager().isClosed() && e.getPlayer().getWorld().getName().equalsIgnoreCase(Main.instance.getBeginningManager().getBeginningWorld().getName())) {
+        if (Main.instance.getBeginningManager() != null
+                && Main.instance.getBeginningManager().getBeginningWorld() != null) {
+            if (Main.instance.getBeginningManager().isClosed() && e.getPlayer().getWorld().getName()
+                    .equalsIgnoreCase(Main.instance.getBeginningManager().getBeginningWorld().getName())) {
                 e.getPlayer().teleport(Main.instance.world.getSpawnLocation());
             }
 
@@ -562,8 +607,10 @@ public class PlayerListener implements Listener {
                 }
 
                 if (!Main.instance.getBeData().generatedBeginningPortal()) {
-                    Main.instance.getBeginningManager().generatePortal(false, new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
-                    Main.instance.getBeginningManager().getBeginningWorld().setSpawnLocation(new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
+                    Main.instance.getBeginningManager().generatePortal(false,
+                            new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
+                    Main.instance.getBeginningManager().getBeginningWorld().setSpawnLocation(
+                            new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
                 }
             }
         }
@@ -573,11 +620,13 @@ public class PlayerListener implements Listener {
     public void onLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
         Bukkit.getOnlinePlayers().forEach(p -> {
-            String JoinMessage = Main.getInstance().getMessages().getMessage("OnLeave", p).replace("%player%", e.getPlayer().getName());
+            String JoinMessage = Main.getInstance().getMessages().getMessage("OnLeave", p).replace("%player%",
+                    e.getPlayer().getName());
             p.sendMessage(JoinMessage);
         });
 
-        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("OnLeave").replace("%player%", e.getPlayer().getName()));
+        Main.getInstance().getMessages().sendConsole(Main.getInstance().getMessages().getMsgForConsole("OnLeave")
+                .replace("%player%", e.getPlayer().getName()));
         Main.instance.getShulkerEvent().removePlayer(e.getPlayer());
         Main.instance.getOrbEvent().removePlayer(e.getPlayer());
 
@@ -612,9 +661,11 @@ public class PlayerListener implements Listener {
 
             OfflinePlayer off = Bukkit.getOfflinePlayer(e.getName());
 
-            if (off == null) return;
+            if (off == null)
+                return;
 
-            if (off.isBanned() || !off.isWhitelisted()) return;
+            if (off.isBanned() || !off.isWhitelisted())
+                return;
 
             long result = actualDay - lastConection;
 
@@ -625,8 +676,7 @@ public class PlayerListener implements Listener {
                                 "&eRazón: AFK\n" +
                                 "&7Si crees que es un\n" +
                                 "&7error, contacta un\n" +
-                                "&7administrador."
-                );
+                                "&7administrador.");
 
                 e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, reason);
                 Bukkit.getBanList(BanList.Type.NAME).addBan(e.getName(), reason, null, "console");
@@ -639,16 +689,19 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onAirChange(EntityAirChangeEvent e) {
-        if (!(e.getEntity() instanceof Player) || Main.instance.getDay() < 50) return;
+        if (!(e.getEntity() instanceof Player) || Main.instance.getDay() < 50)
+            return;
 
         Player p = (Player) e.getEntity();
 
-        if (p.getRemainingAir() < e.getAmount()) return;
+        if (p.getRemainingAir() < e.getAmount())
+            return;
 
         int speed = (Main.instance.getDay() < 60 ? 5 : 10);
         Double damage = (Main.instance.getDay() < 60 ? 5.0D : 10.0D);
 
-        if (e.getAmount() < 20) return;
+        if (e.getAmount() < 20)
+            return;
         int seconds = e.getAmount() / 20;
         int remain = seconds / speed;
         int newAmount = remain * 20;
@@ -670,39 +723,56 @@ public class PlayerListener implements Listener {
             if (e.getItem().hasItemMeta()) {
                 if (e.getItem().getItemMeta().hasDisplayName()) {
 
-                    if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(TextUtils.format("&6Super Golden Apple +"))) {
+                    if (e.getItem().getItemMeta().getDisplayName()
+                            .equalsIgnoreCase(TextUtils.format("&6Super Golden Apple +"))) {
                         Player p = e.getPlayer();
                         int fmin = 60 * 5;
                         if (!p.hasPotionEffect(PotionEffectType.HEALTH_BOOST)) {
                             p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 20 * fmin, 0));
                         }
 
-                    } else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(TextUtils.format("&6Hyper Golden Apple +"))) {
+                    } else if (e.getItem().getItemMeta().getDisplayName()
+                            .equalsIgnoreCase(TextUtils.format("&6Hyper Golden Apple +"))) {
                         if (Main.instance.getDay() < 60) {
-                            if (e.getPlayer().getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE)) {
-                                e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix + "&c¡Ya has comido una Hyper Golden Apple!"));
+                            if (e.getPlayer().getPersistentDataContainer()
+                                    .has(new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE)) {
+                                e.getPlayer().sendMessage(TextUtils
+                                        .format(Main.instance.prefix + "&c¡Ya has comido una Hyper Golden Apple!"));
                                 return;
                             }
-                            e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix + "&a¡Has obtenido contenedores de vida extra!"));
-                            e.getPlayer().getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE, (byte) 1);
+                            e.getPlayer().sendMessage(TextUtils
+                                    .format(Main.instance.prefix + "&a¡Has obtenido contenedores de vida extra!"));
+                            e.getPlayer().getPersistentDataContainer().set(
+                                    new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE,
+                                    (byte) 1);
                         } else {
 
-                            boolean doPlayerAteOne = e.getPlayer().getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE);
-                            boolean doPlayerAteTwo = e.getPlayer().getPersistentDataContainer().has(new NamespacedKey(Main.getInstance(), "hyper_two"), PersistentDataType.BYTE);
+                            boolean doPlayerAteOne = e.getPlayer().getPersistentDataContainer()
+                                    .has(new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE);
+                            boolean doPlayerAteTwo = e.getPlayer().getPersistentDataContainer()
+                                    .has(new NamespacedKey(Main.getInstance(), "hyper_two"), PersistentDataType.BYTE);
 
                             if (!doPlayerAteOne) {
-                                e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix + "&a¡Has obtenido contenedores de vida extra! &e(Hyper Golden Apple 1/2)"));
-                                e.getPlayer().getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE, (byte) 1);
+                                e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix
+                                        + "&a¡Has obtenido contenedores de vida extra! &e(Hyper Golden Apple 1/2)"));
+                                e.getPlayer().getPersistentDataContainer().set(
+                                        new NamespacedKey(Main.getInstance(), "hyper_one"), PersistentDataType.BYTE,
+                                        (byte) 1);
                             } else {
                                 if (doPlayerAteTwo) {
-                                    e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix + "&c¡Ya has comido una Hyper Golden Apple #2!"));
+                                    e.getPlayer().sendMessage(TextUtils.format(
+                                            Main.instance.prefix + "&c¡Ya has comido una Hyper Golden Apple #2!"));
                                     return;
                                 }
-                                e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix + "&a¡Has obtenido contenedores de vida extra! &e(Hyper Golden Apple 2/2)"));
-                                e.getPlayer().getPersistentDataContainer().set(new NamespacedKey(Main.getInstance(), "hyper_two"), PersistentDataType.BYTE, (byte) 1);
+                                e.getPlayer().sendMessage(TextUtils.format(Main.instance.prefix
+                                        + "&a¡Has obtenido contenedores de vida extra! &e(Hyper Golden Apple 2/2)"));
+                                e.getPlayer().getPersistentDataContainer().set(
+                                        new NamespacedKey(Main.getInstance(), "hyper_two"), PersistentDataType.BYTE,
+                                        (byte) 1);
                             }
                         }
-                    } else if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(TextUtils.format("&6Super Golden Apple +"))) {
+                    } else if (e.getItem().getItemMeta().getDisplayName()
+                            .equalsIgnoreCase(TextUtils.format("&6Super Golden Apple +"))) {
                         Player p = e.getPlayer();
                         int fmin = 60 * 5;
                         if (!p.hasPotionEffect(PotionEffectType.HEALTH_BOOST)) {
@@ -712,7 +782,6 @@ public class PlayerListener implements Listener {
                 }
             }
         }
-
 
         if (Main.getInstance().getDay() >= 50) {
             if (e.getItem() != null) {
@@ -738,7 +807,8 @@ public class PlayerListener implements Listener {
                         @Override
                         public void run() {
                             e.getPlayer().removePotionEffect(PotionEffectType.POISON);
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 0));
+                            e.getPlayer()
+                                    .addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 0));
                         }
                     }, 5L);
                 }
@@ -751,9 +821,12 @@ public class PlayerListener implements Listener {
                             e.getPlayer().removePotionEffect(PotionEffectType.CONFUSION);
                             e.getPlayer().removePotionEffect(PotionEffectType.POISON);
                             e.getPlayer().removePotionEffect(PotionEffectType.HUNGER);
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 3));
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 2));
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 1));
+                            e.getPlayer()
+                                    .addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 3));
+                            e.getPlayer()
+                                    .addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 2));
+                            e.getPlayer().addPotionEffect(
+                                    new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 1));
                         }
                     }, 5L);
                 }
@@ -765,7 +838,8 @@ public class PlayerListener implements Listener {
 
                             e.getPlayer().removePotionEffect(PotionEffectType.HUNGER);
 
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 1));
+                            e.getPlayer()
+                                    .addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 1));
                         }
                     }, 5L);
                 }
@@ -777,7 +851,8 @@ public class PlayerListener implements Listener {
 
                             e.getPlayer().removePotionEffect(PotionEffectType.POISON);
 
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 0));
+                            e.getPlayer()
+                                    .addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 0));
                         }
                     }, 5L);
                 }
@@ -796,6 +871,19 @@ public class PlayerListener implements Listener {
                 }
             }
         }
+
+        if (Main.getInstance().getDay() >= 70) {
+            ItemStack i = e.getItem();
+
+            if (i != null) {
+                if (i.getType() == Material.GOLDEN_CARROT) {
+                    e.getPlayer().getServer().getScheduler().runTaskLater(Main.getInstance(), () -> {
+                        float newSaturation = e.getPlayer().getSaturation() - 4.8f;
+                        e.getPlayer().setSaturation(Math.max(newSaturation, 0));
+                    }, 1L);
+                }
+            }
+        }
     }
 
     @EventHandler
@@ -810,6 +898,24 @@ public class PlayerListener implements Listener {
     public void onWC(PlayerChangedWorldEvent e) {
         if (e.getPlayer().getWorld().getName().equalsIgnoreCase(Main.getInstance().endWorld.getName())) {
             createRegenZone(e.getPlayer().getLocation());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        if (Main.getInstance().getDay() >= 70) {
+            if (e.getPlayer().isFlying()) {
+                ItemStack chestplate = e.getPlayer().getInventory().getChestplate();
+                ItemMeta meta = chestplate.getItemMeta();
+                if ((chestplate != null && chestplate.getType() == Material.ELYTRA) && 
+                    meta.isUnbreakable() && ChatColor.stripColor(meta.getDisplayName())
+                        .contains("Infernal")) {
+                    if (new Random().nextInt(100000) < 1) {
+                        chestplate.setDurability((short) chestplate.getType().getMaxDurability());
+                        e.getPlayer().getInventory().setChestplate(chestplate);
+                    }
+                }
+            }
         }
     }
 
@@ -855,10 +961,13 @@ public class PlayerListener implements Listener {
             generateBlocks(false, toGenerate);
 
             centerBlock.getRelative(BlockFace.UP).setType(Material.RED_CARPET);
-            centerBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.SEA_LANTERN);
-            centerBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.RED_CARPET);
+            centerBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP)
+                    .getRelative(BlockFace.UP).setType(Material.SEA_LANTERN);
+            centerBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP)
+                    .getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.RED_CARPET);
 
-            AreaEffectCloud a = (AreaEffectCloud) Main.getInstance().endWorld.spawnEntity(centerBlock.getRelative(BlockFace.UP).getLocation(), EntityType.AREA_EFFECT_CLOUD);
+            AreaEffectCloud a = (AreaEffectCloud) Main.getInstance().endWorld
+                    .spawnEntity(centerBlock.getRelative(BlockFace.UP).getLocation(), EntityType.AREA_EFFECT_CLOUD);
             a.addCustomEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 0), false);
             a.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 0), false);
             a.setDuration(999999);
@@ -922,7 +1031,9 @@ public class PlayerListener implements Listener {
 
                             for (Block all : toChange) {
 
-                                Location used = Main.getInstance().endWorld.getHighestBlockAt(new Location(Main.getInstance().endWorld, all.getX(), all.getY(), all.getZ())).getLocation();
+                                Location used = Main.getInstance().endWorld.getHighestBlockAt(
+                                        new Location(Main.getInstance().endWorld, all.getX(), all.getY(), all.getZ()))
+                                        .getLocation();
 
                                 Block now = Main.getInstance().endWorld.getBlockAt(used);
 
@@ -967,7 +1078,8 @@ public class PlayerListener implements Listener {
             ArrayList<Block> blocks = new ArrayList<>();
             Block centerBlockOfWool = Main.getInstance().endWorld.getBlockAt(toGenerate);
 
-            Block corner1 = centerBlockOfWool.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getRelative(BlockFace.EAST).getRelative(BlockFace.EAST);
+            Block corner1 = centerBlockOfWool.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+                    .getRelative(BlockFace.EAST).getRelative(BlockFace.EAST);
 
             blocks.add(corner1);
             blocks.add(corner1.getRelative(BlockFace.WEST));
@@ -975,14 +1087,16 @@ public class PlayerListener implements Listener {
             blocks.add(corner1.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST));
 
             // CORNER 2
-            blocks.add(corner1.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST));
+            blocks.add(corner1.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST)
+                    .getRelative(BlockFace.WEST));
 
             blocks.add(corner1.getRelative(BlockFace.SOUTH));
             blocks.add(corner1.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH));
             blocks.add(corner1.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH));
 
             // CORNER 3
-            Block southC = corner1.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH);
+            Block southC = corner1.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH)
+                    .getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH);
             blocks.add(southC);
 
             blocks.add(southC.getRelative(BlockFace.WEST));
@@ -990,7 +1104,8 @@ public class PlayerListener implements Listener {
             blocks.add(southC.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST));
 
             // CORNER 4
-            Block finalC = southC.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST);
+            Block finalC = southC.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST)
+                    .getRelative(BlockFace.WEST);
             blocks.add(finalC);
 
             blocks.add(finalC.getRelative(BlockFace.NORTH));
@@ -1019,7 +1134,9 @@ public class PlayerListener implements Listener {
         manager.runCheckForInfernalElytra();
         manager.runCheckForGaps();
 
-        if (e.getInventory().getResult() != null && e.getInventory().getResult().getType().name().toLowerCase().contains("leather_") && !e.getInventory().getResult().getItemMeta().isUnbreakable() && Main.instance.getDay() >= 25) {
+        if (e.getInventory().getResult() != null
+                && e.getInventory().getResult().getType().name().toLowerCase().contains("leather_")
+                && !e.getInventory().getResult().getItemMeta().isUnbreakable() && Main.instance.getDay() >= 25) {
             e.getInventory().setResult(new ItemStack(Material.AIR));
         }
     }
@@ -1032,21 +1149,24 @@ public class PlayerListener implements Listener {
 
             ItemStack res = e.getRecipe().getResult();
 
-            if (e.isCancelled() || e.getResult() != Event.Result.ALLOW) return;
+            if (e.isCancelled() || e.getResult() != Event.Result.ALLOW)
+                return;
 
             if (res.hasItemMeta()) {
 
                 if (PermadeathItems.isEndRelic(res)) {
 
                     ItemMeta meta = res.getItemMeta();
-                    meta.setLore(Arrays.asList(HiddenStringUtils.encodeString("{" + UUID.randomUUID().toString() + ": 0}")));
+                    meta.setLore(
+                            Arrays.asList(HiddenStringUtils.encodeString("{" + UUID.randomUUID().toString() + ": 0}")));
                     res.setItemMeta(meta);
 
                     e.setCurrentItem(res);
                     return;
                 }
 
-                if (res.isSimilar(PermadeathItems.createBeginningRelic()) || res.isSimilar(PermadeathItems.createLifeOrb())) {
+                if (res.isSimilar(PermadeathItems.createBeginningRelic())
+                        || res.isSimilar(PermadeathItems.createLifeOrb())) {
                     if (e.getWhoClicked() instanceof Player) {
                         e.getInventory().setMatrix(clearMatrix());
                         Player p = (Player) e.getWhoClicked();
@@ -1054,7 +1174,9 @@ public class PlayerListener implements Listener {
                     }
                 }
 
-                if (res.getItemMeta().hasDisplayName() && res.getItemMeta().getDisplayName().contains(TextUtils.format("&6Hyper Golden Apple +")) || res.getItemMeta().getDisplayName().contains(TextUtils.format("&6Super Golden Apple +"))) {
+                if (res.getItemMeta().hasDisplayName()
+                        && res.getItemMeta().getDisplayName().contains(TextUtils.format("&6Hyper Golden Apple +"))
+                        || res.getItemMeta().getDisplayName().contains(TextUtils.format("&6Super Golden Apple +"))) {
                     if (e.getWhoClicked() instanceof Player) {
 
                         e.getInventory().setMatrix(clearMatrix());
@@ -1066,15 +1188,27 @@ public class PlayerListener implements Listener {
                     }
                 }
             }
+
+            if (Main.getInstance().getDay() >= 70) {
+                DateManager manager = DateManager.getInstance();
+                String playerId = e.getWhoClicked().getUniqueId().toString();
+                int numCraft = manager.getConfig().getInt("LimitCraft." + playerId, 0);
+                if (numCraft >= MAX_CRAFTS_PER_DAY) {
+                    e.setCancelled(true);
+                    e.getWhoClicked().sendMessage("Has superado el limite de crafteos por dia.");
+                } else {
+                    manager.getConfig().set("LimitCraft." + playerId, numCraft + 1);
+                }
+            }
         }
     }
 
     public ItemStack[] clearMatrix() {
 
-        return new ItemStack[]{
+        return new ItemStack[] {
                 new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR),
                 new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR),
-                new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)};
+                new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR) };
     }
 
     private class CraftPrepareManager {
@@ -1089,7 +1223,8 @@ public class PlayerListener implements Listener {
 
         public void runCheckForBeginningRelic() {
 
-            if (result == null) return;
+            if (result == null)
+                return;
 
             if (result.isSimilar(PermadeathItems.createBeginningRelic())) {
                 int diamondBlocks = 0;
@@ -1118,9 +1253,11 @@ public class PlayerListener implements Listener {
         }
 
         public void runCheckForInfernalPiece() {
-            if (result == null) return;
+            if (result == null)
+                return;
             if (NetheriteArmor.isInfernalPiece(result)) {
-                if (result.getType() == Material.ELYTRA) return;
+                if (result.getType() == Material.ELYTRA)
+                    return;
                 int diamondsFound = 0;
                 boolean foundPiece = false;
 
@@ -1129,7 +1266,8 @@ public class PlayerListener implements Listener {
                         if (item.hasItemMeta()) {
                             ItemMeta meta = item.getItemMeta();
                             if (item.getType() == Material.DIAMOND) {
-                                if (meta.isUnbreakable() && ChatColor.stripColor(item.getItemMeta().getDisplayName()).contains("Infernal")) {
+                                if (meta.isUnbreakable() && ChatColor.stripColor(item.getItemMeta().getDisplayName())
+                                        .contains("Infernal")) {
                                     diamondsFound = diamondsFound + 1;
                                 }
                             }
@@ -1168,7 +1306,8 @@ public class PlayerListener implements Listener {
         }
 
         public void runCheckForInfernalElytra() {
-            if (result == null) return;
+            if (result == null)
+                return;
             if (result.getType() == Material.ELYTRA) {
 
                 int diamondsFound = 0;
@@ -1178,7 +1317,8 @@ public class PlayerListener implements Listener {
                         if (item.hasItemMeta()) {
                             ItemMeta meta = item.getItemMeta();
                             if (item.getType() == Material.DIAMOND) {
-                                if (meta.isUnbreakable() && ChatColor.stripColor(item.getItemMeta().getDisplayName()).contains("Infernal")) {
+                                if (meta.isUnbreakable() && ChatColor.stripColor(item.getItemMeta().getDisplayName())
+                                        .contains("Infernal")) {
                                     diamondsFound = diamondsFound + 1;
                                 }
                             }
@@ -1195,7 +1335,8 @@ public class PlayerListener implements Listener {
         }
 
         public void runCheckForGaps() {
-            if (result == null) return;
+            if (result == null)
+                return;
             if (result.getItemMeta().getDisplayName().startsWith(TextUtils.format("&6Hyper"))) {
 
                 if (Main.instance.getDay() < 60) {
@@ -1212,7 +1353,9 @@ public class PlayerListener implements Listener {
                     }
 
                     if (found >= 8) {
-                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
+                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1)
+                                .setDisplayName(TextUtils.format("&6Hyper Golden Apple +"))
+                                .addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
                     } else {
 
                         e.getInventory().setResult(null);
@@ -1236,7 +1379,9 @@ public class PlayerListener implements Listener {
                     }
 
                     if (found >= 8 && enoughGaps) {
-                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
+                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1)
+                                .setDisplayName(TextUtils.format("&6Hyper Golden Apple +"))
+                                .addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
                     } else {
 
                         e.getInventory().setResult(null);
@@ -1261,15 +1406,20 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 if (found >= 8) {
-                    e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Super Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
+                    e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1)
+                            .setDisplayName(TextUtils.format("&6Super Golden Apple +"))
+                            .addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
                 }
             }
         }
 
         public void runCheckForLifeOrb() {
-            if (result == null) return;
-            if (!result.isSimilar(PermadeathItems.createLifeOrb())) return;
-            if (!Main.instance.getOrbEvent().isRunning()) return;
+            if (result == null)
+                return;
+            if (!result.isSimilar(PermadeathItems.createLifeOrb()))
+                return;
+            if (!Main.instance.getOrbEvent().isRunning())
+                return;
             int items = 0;
 
             for (ItemStack s : e.getInventory().getMatrix()) {

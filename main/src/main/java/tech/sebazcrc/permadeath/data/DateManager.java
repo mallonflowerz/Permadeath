@@ -6,6 +6,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.log.PDCLog;
 import tech.sebazcrc.permadeath.util.TextUtils;
@@ -40,7 +42,9 @@ public class DateManager {
             this.startDate = LocalDate.parse(date);
         } catch (DateTimeParseException ex) {
 
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(Main.prefix + "&4&lERROR: &eLa fecha en config.yml estaba mal configurada &7(" + c.getString("Fecha") + ")&e."));
+            Bukkit.getConsoleSender().sendMessage(
+                    TextUtils.format(Main.prefix + "&4&lERROR: &eLa fecha en config.yml estaba mal configurada &7("
+                            + c.getString("Fecha") + ")&e."));
             Bukkit.getConsoleSender().sendMessage(TextUtils.format(Main.prefix + "&eSe ha establecido el día: &b1"));
             this.startDate = LocalDate.parse(getDateForDayOne());
 
@@ -56,6 +60,7 @@ public class DateManager {
 
         if (this.currentDate.isBefore(now)) {
             this.currentDate = now;
+            resetCraftsPlayers();
             DiscordPortal.onDayChange();
         }
     }
@@ -86,10 +91,12 @@ public class DateManager {
         }
 
         LocalDate add = currentDate.minusDays(nD);
-        DateManager.getInstance().setNewDate(String.format(add.getYear() + "-%02d-%02d", add.getMonthValue(), add.getDayOfMonth()));
+        DateManager.getInstance()
+                .setNewDate(String.format(add.getYear() + "-%02d-%02d", add.getMonthValue(), add.getDayOfMonth()));
 
         sender.sendMessage(TextUtils.format("&eSe han actualizado los días a: &7" + nD));
-        sender.sendMessage(TextUtils.format("&c&lNota importante: &7Algunos cambios pueden requerir un reinicio y la fecha puede no ser exacta."));
+        sender.sendMessage(TextUtils.format(
+                "&c&lNota importante: &7Algunos cambios pueden requerir un reinicio y la fecha puede no ser exacta."));
 
         PDCLog.getInstance().log("Día cambiado a: " + nD);
 
@@ -97,9 +104,11 @@ public class DateManager {
         if (Bukkit.getOnlinePlayers() != null && Bukkit.getOnlinePlayers().size() >= 1) {
             for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
 
-                if (off == null) return;
+                if (off == null)
+                    return;
 
-                if (off.isBanned()) return;
+                if (off.isBanned())
+                    return;
 
                 PlayerDataManager manager = new PlayerDataManager(off.getName(), instance);
                 manager.setLastDay(getDay());
@@ -167,8 +176,19 @@ public class DateManager {
         }
     }
 
+    private void resetCraftsPlayers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            this.c.set(player.getUniqueId().toString(), 0);
+        }
+    }
+
+    public FileConfiguration getConfig() {
+        return c;
+    }
+
     public static DateManager getInstance() {
-        if (dai == null) dai = new DateManager();
+        if (dai == null)
+            dai = new DateManager();
         return dai;
     }
 }

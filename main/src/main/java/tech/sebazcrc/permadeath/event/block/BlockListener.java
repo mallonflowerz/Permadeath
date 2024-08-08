@@ -23,9 +23,12 @@ import tech.sebazcrc.permadeath.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class BlockListener implements Listener {
-    public static final List<ItemStack> NO_DAMAGE_TOOLS = Arrays.asList(PermadeathItems.craftNetheriteAxe(), PermadeathItems.craftNetheriteShovel(), PermadeathItems.craftNetheriteSword(), PermadeathItems.craftNetheritePickaxe(), PermadeathItems.craftNetheriteHoe());
+    public static final List<ItemStack> NO_DAMAGE_TOOLS = Arrays.asList(PermadeathItems.craftNetheriteAxe(),
+            PermadeathItems.craftNetheriteShovel(), PermadeathItems.craftNetheriteSword(),
+            PermadeathItems.craftNetheritePickaxe(), PermadeathItems.craftNetheriteHoe());
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockBurn(BlockBurnEvent e) {
@@ -44,6 +47,10 @@ public class BlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockExplode(EntityExplodeEvent e) {
+        if (Main.getInstance().getDay() >= 70) {
+            e.blockList().clear();
+        }
+
         if (Main.getInstance().getEndData() != null) {
             EndDataManager ma = Main.getInstance().getEndData();
             if (ma.getConfig().contains("RegenZoneLocation")) {
@@ -97,7 +104,8 @@ public class BlockListener implements Listener {
                     if (e.getBlock().getLocation().distance(loc) <= 3) {
 
                         e.setCancelled(true);
-                        e.getPlayer().sendMessage(TextUtils.format("&cNo puedes colocar bloques cerca de la Zona de Regeneración."));
+                        e.getPlayer().sendMessage(
+                                TextUtils.format("&cNo puedes colocar bloques cerca de la Zona de Regeneración."));
                     }
                 }
             }
@@ -120,7 +128,8 @@ public class BlockListener implements Listener {
                     if (e.getBlock().getLocation().distance(loc) <= 4) {
 
                         e.setCancelled(true);
-                        e.getPlayer().sendMessage(TextUtils.format("&cNo puedes romper bloques cerca de la Zona de Regeneración."));
+                        e.getPlayer().sendMessage(
+                                TextUtils.format("&cNo puedes romper bloques cerca de la Zona de Regeneración."));
                     }
                 }
             }
@@ -144,6 +153,17 @@ public class BlockListener implements Listener {
                     e.getPlayer().damage(1.0D);
                 } else {
                     e.getPlayer().damage(16.0D);
+                }
+            }
+        }
+
+        if (Main.getInstance().getDay() >= 70) {
+            Block block = e.getBlock();
+            Material type = block.getType();
+
+            if (isOre(type)) {
+                if (new Random().nextInt(100) < 50) {
+                    e.setDropItems(false);
                 }
             }
         }
@@ -181,6 +201,18 @@ public class BlockListener implements Listener {
 
             }
         }
+    }
+
+    private boolean isOre(Material material) {
+        // Lista de materiales que consideramos como menas
+        return material == Material.COAL_ORE ||
+               material == Material.IRON_ORE ||
+               material == Material.GOLD_ORE ||
+               material == Material.REDSTONE_ORE ||
+               material == Material.DIAMOND_ORE ||
+               material == Material.EMERALD_ORE ||
+               material == Material.LAPIS_ORE ||
+               material == Material.NETHER_QUARTZ_ORE;
     }
 
     private Location buildLocation(String s) {

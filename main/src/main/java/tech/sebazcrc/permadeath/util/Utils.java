@@ -22,4 +22,8 @@ public class Utils {
     public static void initializeKeys(JavaPlugin plugin) {
         UNIQUE_VILLAGER_KEY = new NamespacedKey(plugin, "villager_unique_id");
     }
+
+    public static int getExperienceTotalFromLevels(int levels) {
+        return 2 * levels * levels + 3 * levels;
+    }
 }

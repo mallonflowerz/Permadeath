@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.data.PlayerDataManager;
 import tech.sebazcrc.permadeath.util.EntityTeleport;
+import tech.sebazcrc.permadeath.util.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -88,6 +89,48 @@ public class EntityEvents implements Listener {
         //if (e.getEntity() instanceof Creeper && instance.getDays() >= 50 && e.getEntity().getWorld().getEnvironment() == World.Environment.NORMAL) {
         if (e.getEntity() instanceof Creeper || e.getEntity() instanceof Ghast) {
             new EntityTeleport(e.getEntity(), e);
+        }
+
+        if (Main.getInstance().getDay() >= 70) {
+            if (e.getEntity() instanceof Player) {
+                Player player = (Player) e.getEntity();
+                
+                if (e.getCause() == EntityDamageEvent.DamageCause.CONTACT) {
+                    player.setHealth(0);
+                    return;
+                }
+
+                if (e.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+                    // Multiplicar el daño por 5
+                    double originalDamage = e.getDamage();
+                    double increasedDamage = originalDamage * 5;
+                    e.setDamage(increasedDamage);
+                }
+
+                double damage = e.getFinalDamage();
+
+                int xpToRemove = (int) Math.ceil(damage);
+
+                int currentXp = player.getTotalExperience();
+                int viewXp = Math.max(currentXp - xpToRemove, 0);
+
+                player.setTotalExperience(viewXp);
+
+                // Ajustar su velocidad
+                int currentLevel = player.getLevel();
+
+                int maxLevels = 30;
+                double minSpeed = 0.1;
+                double maxSpeed = 0.2;
+
+                int maxXp = Utils.getExperienceTotalFromLevels(maxLevels);
+                currentXp = Utils.getExperienceTotalFromLevels(currentLevel);
+
+                double speedFactor = (double) currentXp / maxXp;
+                double newSpeed = Math.max(minSpeed, maxSpeed * (1 - speedFactor));
+
+                player.setWalkSpeed((float) newSpeed);
+            }
         }
     }
 

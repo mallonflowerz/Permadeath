@@ -179,6 +179,15 @@ TotemFail:
     68: 7
     69: 7
     70: 15
+    71: 15
+    72: 15
+    73: 15
+    74: 15
+    75: 15
+    76: 15
+    77: 15
+    78: 15
+    79: 15
 # Configuración de la dimensióon
 TheBeginning:
   # Este es un límite de donde aparecerá el portal a la dimensión.
@@ -186,6 +195,7 @@ TheBeginning:
   # Este número también cuenta como negativo.
   X-Limit: 3000
   Z-Limit: 3000
+LimitCraft:
 # NO TOCAR
 DontTouch:
   PlayTime: 0

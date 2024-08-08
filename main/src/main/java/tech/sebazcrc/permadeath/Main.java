@@ -43,6 +43,7 @@ import tech.sebazcrc.permadeath.event.entity.TotemListener;
 import tech.sebazcrc.permadeath.event.HostileEntityListener;
 import tech.sebazcrc.permadeath.event.paper.PaperListeners;
 import tech.sebazcrc.permadeath.event.player.AnvilListener;
+import tech.sebazcrc.permadeath.event.player.CraftingListener;
 import tech.sebazcrc.permadeath.event.player.PlayerListener;
 import tech.sebazcrc.permadeath.event.player.SlotBlockListener;
 import tech.sebazcrc.permadeath.event.raid.RaidEvents;
@@ -97,9 +98,11 @@ public final class Main extends JavaPlugin implements Listener {
     private ShellEvent shulkerEvent;
     private LifeOrbEvent orbEvent;
     private SpawnListener spawnListener;
+    private CraftingListener craftingListener;
 
     public static boolean optifineItemsEnabled() {
-        if (instance == null) return false;
+        if (instance == null)
+            return false;
         return instance.getConfig().getBoolean("Toggles.OptifineItems");
     }
 
@@ -110,7 +113,8 @@ public final class Main extends JavaPlugin implements Listener {
         this.saveDefaultConfig();
         setupConsoleFilter();
 
-        prefix = TextUtils.format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&cPermadeath &7➤ &f"));
+        prefix = TextUtils
+                .format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&cPermadeath &7➤ &f"));
 
         tickAll();
 
@@ -136,6 +140,9 @@ public final class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        if (this.craftingListener != null) {
+            this.craftingListener.saveLimitCraft();
+        }
 
         getConfig().set("DontTouch.PlayTime", this.playTime);
         saveConfig();
@@ -163,12 +170,16 @@ public final class Main extends JavaPlugin implements Listener {
                 if (!loaded) {
 
                     if (DiscordPortal.isJDAInstalled()) {
-                        Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&aSe ha encontrado la librería JDA, cargando bot de Discord."));
+                        Bukkit.getConsoleSender().sendMessage(TextUtils
+                                .format(prefix + "&aSe ha encontrado la librería JDA, cargando bot de Discord."));
                         DiscordPortal.reload();
                     } else {
-                        Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&cNo se ha encontrado una librería JDA, deberás instalar una en caso de querer utilizar un bot de Discord."));
-                        Bukkit.getConsoleSender().sendMessage(TextUtils.format("&eDescarga aquí: &f" + Utils.SPIGOT_LINK));
-                        Bukkit.getConsoleSender().sendMessage(TextUtils.format("&eSi no puedes descargarlo allí, únete a este Discord y te daremos acceso al enlace: &ehttps://discord.gg/8evPbuxPke"));
+                        Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix
+                                + "&cNo se ha encontrado una librería JDA, deberás instalar una en caso de querer utilizar un bot de Discord."));
+                        Bukkit.getConsoleSender()
+                                .sendMessage(TextUtils.format("&eDescarga aquí: &f" + Utils.SPIGOT_LINK));
+                        Bukkit.getConsoleSender().sendMessage(TextUtils.format(
+                                "&eSi no puedes descargarlo allí, únete a este Discord y te daremos acceso al enlace: &ehttps://discord.gg/8evPbuxPke"));
                     }
 
                     startPlugin();
@@ -182,7 +193,8 @@ public final class Main extends JavaPlugin implements Listener {
                         try {
                             int version = getConfig().getInt("config-version");
                             if (version != CURRENT_CONFIG_VERSION) {
-                                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eEstamos eliminando config.yml debido a que está desactualizado."));
+                                Bukkit.getConsoleSender().sendMessage(TextUtils.format(
+                                        prefix + "&eEstamos eliminando config.yml debido a que está desactualizado."));
                                 PDCLog.getInstance().log("Eliminando config.yml por versión antigua.");
                                 getFile().delete();
                                 saveDefaultConfig();
@@ -209,15 +221,18 @@ public final class Main extends JavaPlugin implements Listener {
                     playTime++;
 
                     if (playTime % (3600) == 0) {
-                        Bukkit.broadcastMessage(prefix + TextUtils.format("&cFelicitaciones, han avanzado a la hora número: " + getDay()));
+                        Bukkit.broadcastMessage(prefix
+                                + TextUtils.format("&cFelicitaciones, han avanzado a la hora número: " + getDay()));
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100.0F, 100.0F);
                         }
                     }
                 }
 
-                if (getDay() >= 60 && !getConfig().getBoolean("DontTouch.Event.LifeOrbEnded") && !getOrbEvent().isRunning()) {
-                    if (SPEED_RUN_MODE) orbEvent.setTimeLeft(60 * 8);
+                if (getDay() >= 60 && !getConfig().getBoolean("DontTouch.Event.LifeOrbEnded")
+                        && !getOrbEvent().isRunning()) {
+                    if (SPEED_RUN_MODE)
+                        orbEvent.setTimeLeft(60 * 8);
                     orbEvent.setRunning(true);
                 }
 
@@ -230,9 +245,12 @@ public final class Main extends JavaPlugin implements Listener {
 
     private void tickWorlds() {
         if (this.getDay() >= 40) {
-            for (World w : Bukkit.getWorlds().stream().filter(world1 -> world1.getEnvironment() != World.Environment.THE_END).collect(Collectors.toList())) {
+            for (World w : Bukkit.getWorlds().stream()
+                    .filter(world1 -> world1.getEnvironment() != World.Environment.THE_END)
+                    .collect(Collectors.toList())) {
                 for (Ravager ravager : w.getEntitiesByClass(Ravager.class)) {
-                    if (ravager.getPersistentDataContainer().has(new NamespacedKey(instance, "ultra_ravager"), PersistentDataType.BYTE)) {
+                    if (ravager.getPersistentDataContainer().has(new NamespacedKey(instance, "ultra_ravager"),
+                            PersistentDataType.BYTE)) {
                         List<Block> b = ravager.getLineOfSight(null, 5);
 
                         for (Block block : b) {
@@ -242,7 +260,8 @@ public final class Main extends JavaPlugin implements Listener {
                                         Block r = block.getRelative(i, j, k);
                                         if (r.getType() == Material.NETHERRACK) {
                                             r.setType(Material.AIR);
-                                            r.getWorld().playSound(r.getLocation(), Sound.BLOCK_STONE_BREAK, 2.0F, 1.0F);
+                                            r.getWorld().playSound(r.getLocation(), Sound.BLOCK_STONE_BREAK, 2.0F,
+                                                    1.0F);
                                         }
                                     }
                                 }
@@ -256,7 +275,8 @@ public final class Main extends JavaPlugin implements Listener {
 
     private void tickPlayers() {
 
-        if (Bukkit.getOnlinePlayers().size() < 1) return;
+        if (Bukkit.getOnlinePlayers().size() < 1)
+            return;
 
         long segundosbrutos = world.getWeatherDuration() / 20;
 
@@ -265,7 +285,8 @@ public final class Main extends JavaPlugin implements Listener {
         long seconds = segundosbrutos % 60;
         long days = segundosbrutos / 86400;
 
-        final String time = String.format((days >= 1 ? String.format("%02d día(s) ", days) : "") + "%02d:%02d:%02d", hours, minutes, seconds);
+        final String time = String.format((days >= 1 ? String.format("%02d día(s) ", days) : "") + "%02d:%02d:%02d",
+                hours, minutes, seconds);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
 
@@ -290,14 +311,16 @@ public final class Main extends JavaPlugin implements Listener {
                 String actionBar = "";
 
                 if (world.hasStorm()) {
-                    actionBar = getMessages().getMessageByPlayer("Server-Messages.ActionBarMessage", player.getName()).replace("%tiempo%", time) + " - ";
+                    actionBar = getMessages().getMessageByPlayer("Server-Messages.ActionBarMessage", player.getName())
+                            .replace("%tiempo%", time) + " - ";
                 }
                 actionBar = actionBar + ChatColor.GRAY + "Tiempo total: " + TextUtils.formatInterval(playTime);
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBar));
 
             } else {
                 if (world.hasStorm()) {
-                    String msg = getMessages().getMessageByPlayer("Server-Messages.ActionBarMessage", player.getName()).replace("%tiempo%", time);
+                    String msg = getMessages().getMessageByPlayer("Server-Messages.ActionBarMessage", player.getName())
+                            .replace("%tiempo%", time);
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
                 }
             }
@@ -392,10 +415,15 @@ public final class Main extends JavaPlugin implements Listener {
                         spawns.add(ploc.clone().add(-5, 25, 5));
 
                         for (Location l : spawns) {
-                            if (w.getBlockAt(l).getType() == Material.AIR && w.getBlockAt(l.clone().add(0, 1, 0)).getType() == Material.AIR) {
+                            if (w.getBlockAt(l).getType() == Material.AIR
+                                    && w.getBlockAt(l.clone().add(0, 1, 0)).getType() == Material.AIR) {
                                 int randomEntities = this.random.nextInt(3) + 1;
                                 for (int i = 0; i < randomEntities; i++) {
-                                    getNmsHandler().spawnNMSEntity("PigZombie", EntityType.valueOf(VersionManager.isRunningPostNetherUpdate() ? "ZOMBIFIED_PIGLIN" : "PIG_ZOMBIE"), l, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                                    getNmsHandler().spawnNMSEntity("PigZombie",
+                                            EntityType.valueOf(
+                                                    VersionManager.isRunningPostNetherUpdate() ? "ZOMBIFIED_PIGLIN"
+                                                            : "PIG_ZOMBIE"),
+                                            l, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }
                             }
                         }
@@ -407,7 +435,8 @@ public final class Main extends JavaPlugin implements Listener {
                 if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SOUL_SAND) {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30 * 20, 2));
                 }
-                Integer timeForWither = player.getPersistentDataContainer().get(new NamespacedKey(this, "wither"), PersistentDataType.INTEGER);
+                Integer timeForWither = player.getPersistentDataContainer().get(new NamespacedKey(this, "wither"),
+                        PersistentDataType.INTEGER);
                 if (timeForWither == null) {
                     timeForWither = 0;
                 }
@@ -420,7 +449,8 @@ public final class Main extends JavaPlugin implements Listener {
                     } catch (Exception x) {
                     }
                 }
-                player.getPersistentDataContainer().set(new NamespacedKey(this, "wither"), PersistentDataType.INTEGER, ++timeForWither);
+                player.getPersistentDataContainer().set(new NamespacedKey(this, "wither"), PersistentDataType.INTEGER,
+                        ++timeForWither);
 
                 if (getConfig().getBoolean("Toggles.Mike-Creeper-Spawn")) {
 
@@ -446,8 +476,9 @@ public final class Main extends JavaPlugin implements Listener {
             }
 
             if (getDay() >= 70) {
-                getConfig().set("Toggles.Mike-Creeper-Spawn", false);
-                this.saveConfig();
+                if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.OBSIDIAN) {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 10 * 20, 19));
+                }
             }
         }
     }
@@ -472,7 +503,8 @@ public final class Main extends JavaPlugin implements Listener {
                 this.orbEvent.setTitle(TextUtils.format("&6&l" + tiempo + " para obtener el Life Orb"));
             } else {
 
-                Bukkit.broadcastMessage(TextUtils.format(instance.prefix + "&cSe ha acabado el tiempo para obtener el Life Orb, ¡sufrid! ahora tendreís 8 contenedores de vida menos."));
+                Bukkit.broadcastMessage(TextUtils.format(instance.prefix
+                        + "&cSe ha acabado el tiempo para obtener el Life Orb, ¡sufrid! ahora tendreís 8 contenedores de vida menos."));
                 this.orbEvent.setRunning(false);
                 this.orbEvent.clearPlayers();
                 this.orbEvent.setTimeLeft((SPEED_RUN_MODE ? 60 * 8 : 60 * 60 * 8));
@@ -502,7 +534,8 @@ public final class Main extends JavaPlugin implements Listener {
                 this.shulkerEvent.setTitle(TextUtils.format("&e&lX2 Shulker Shells: &b&n" + tiempo));
             } else {
 
-                Bukkit.broadcastMessage(TextUtils.format(instance.prefix + "&eEl evento de &c&lX2 Shulker Shells &eha acabado."));
+                Bukkit.broadcastMessage(
+                        TextUtils.format(instance.prefix + "&eEl evento de &c&lX2 Shulker Shells &eha acabado."));
                 this.shulkerEvent.setRunning(false);
                 this.shulkerEvent.clearPlayers();
                 this.shulkerEvent.setTimeLeft(60 * 60 * 4);
@@ -536,25 +569,45 @@ public final class Main extends JavaPlugin implements Listener {
             new FileAPI.FileOut(instance, "original_schematics/island5.schem", "schematics/", true);
         }
 
-        int HelmetValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Helmet")));
-        int ChestplateValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Chestplate")));
-        int LeggingsValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Leggings")));
-        int BootsValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Boots")));
+        int HelmetValue = Integer
+                .parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Helmet")));
+        int ChestplateValue = Integer
+                .parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Chestplate")));
+        int LeggingsValue = Integer
+                .parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Leggings")));
+        int BootsValue = Integer
+                .parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Boots")));
         if (HelmetValue > 100 || HelmetValue < 1) {
-            PDCLog.getInstance().log("[ERROR] Error al cargar la probabilidad de 'Helmet' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.", true);
-            PDCLog.getInstance().log("[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Error al cargar la probabilidad de 'Helmet' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.",
+                    true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.",
+                    true);
         }
         if (ChestplateValue > 100 || ChestplateValue < 1) {
-            PDCLog.getInstance().log("[ERROR] Error al cargar la probabilidad de 'Chestplate' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.", true);
-            PDCLog.getInstance().log("[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Error al cargar la probabilidad de 'Chestplate' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.",
+                    true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.",
+                    true);
         }
         if (LeggingsValue > 100 || LeggingsValue < 1) {
-            PDCLog.getInstance().log("[ERROR] Error al cargar la probabilidad de 'Leggings' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.", true);
-            PDCLog.getInstance().log("[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Error al cargar la probabilidad de 'Leggings' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.",
+                    true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.",
+                    true);
         }
         if (BootsValue > 100 || BootsValue < 1) {
-            PDCLog.getInstance().log("[ERROR] Error al cargar la probabilidad de 'BootsValue' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.", true);
-            PDCLog.getInstance().log("[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Error al cargar la probabilidad de 'BootsValue' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.",
+                    true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.",
+                    true);
         }
         String compatibleVersion = VersionManager.getVersion() != null ? ("&aCompatible") : "&cIncompatible";
 
@@ -579,8 +632,10 @@ public final class Main extends JavaPlugin implements Listener {
 
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("             &c&lPERMADEATH"));
-        Bukkit.getConsoleSender().sendMessage(TextUtils.format("     &7- Versión: &e" + this.getDescription().getVersion()));
-        Bukkit.getConsoleSender().sendMessage(TextUtils.format("     &7- Versión del Servidor: &e" + VersionManager.getFormattedVersion()));
+        Bukkit.getConsoleSender()
+                .sendMessage(TextUtils.format("     &7- Versión: &e" + this.getDescription().getVersion()));
+        Bukkit.getConsoleSender().sendMessage(
+                TextUtils.format("     &7- Versión del Servidor: &e" + VersionManager.getFormattedVersion()));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format(" &7>> &e&lINFORME DE ESTADO"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&7> &bEstado de mundos: " + worldState));
@@ -591,15 +646,19 @@ public final class Main extends JavaPlugin implements Listener {
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&7> &b&lCambios:"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&7>   &aDías disponibles: &71-60"));
 
-        worldEditFound = (Bukkit.getPluginManager().getPlugin("WorldEdit") != null || Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null);
+        worldEditFound = (Bukkit.getPluginManager().getPlugin("WorldEdit") != null
+                || Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null);
         if (!worldEditFound) {
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format("&7> &4&lADVERTENCIA: &7No se ha encontrado el plugin &7World Edit"));
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format("&7> &7Algunas funciones pueden no funcionar correctamente. Ten en cuenta que las estructuras de The Beginning no podrán ser generadas en días avanzados."));
+            Bukkit.getConsoleSender()
+                    .sendMessage(TextUtils.format("&7> &4&lADVERTENCIA: &7No se ha encontrado el plugin &7World Edit"));
+            Bukkit.getConsoleSender().sendMessage(TextUtils.format(
+                    "&7> &7Algunas funciones pueden no funcionar correctamente. Ten en cuenta que las estructuras de The Beginning no podrán ser generadas en días avanzados."));
             PDCLog.getInstance().log("No se encontró WorldEdit");
         }
 
         if (software.contains("Bukkit")) {
-            Bukkit.broadcastMessage(TextUtils.format(prefix + "&7> &4&lADVERTENCIA&7: &eEl plugin NO es compatible con CraftBukkit, cambia a SpigotMC o PaperSpigot"));
+            Bukkit.broadcastMessage(TextUtils.format(prefix
+                    + "&7> &4&lADVERTENCIA&7: &eEl plugin NO es compatible con CraftBukkit, cambia a SpigotMC o PaperSpigot"));
             PDCLog.getInstance().disable("No es compatible con Bukkit.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -610,7 +669,8 @@ public final class Main extends JavaPlugin implements Listener {
 
         new UpdateChecker(this).getVersion(version -> {
             if (this.getDescription().getVersion().equalsIgnoreCase(version)) {
-                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&bVersión del plugin: &aVersión más reciente instalada."));
+                Bukkit.getConsoleSender().sendMessage(
+                        TextUtils.format(prefix + "&bVersión del plugin: &aVersión más reciente instalada."));
             } else {
                 Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eNueva versión detectada."));
                 Bukkit.getConsoleSender().sendMessage(TextUtils.format("&7> &aDescarga: &7" + Utils.SPIGOT_LINK));
@@ -637,10 +697,12 @@ public final class Main extends JavaPlugin implements Listener {
 
             this.hostile = new HostileEntityListener(this);
             getServer().getPluginManager().registerEvents(hostile, instance);
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado los cambios de Mobs pacíficos hostiles."));
+            Bukkit.getConsoleSender().sendMessage(
+                    TextUtils.format(prefix + "&eSe han registrado los cambios de Mobs pacíficos hostiles."));
         }
 
-        if (DateManager.getInstance().getDay() >= 30 && endManager == null && endData == null && !registeredDays.get(30)) {
+        if (DateManager.getInstance().getDay() >= 30 && endManager == null && endData == null
+                && !registeredDays.get(30)) {
             registeredDays.replace(30, true);
 
             this.endManager = new EndManager(instance);
@@ -650,27 +712,33 @@ public final class Main extends JavaPlugin implements Listener {
 
             if (runningPaperSpigot) {
                 getServer().getPluginManager().registerEvents(new PaperListeners(instance), instance);
-                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios especiales para &c&lPaperMC&e."));
+                Bukkit.getConsoleSender().sendMessage(
+                        TextUtils.format(prefix + "&eSe han registrado cambios especiales para &c&lPaperMC&e."));
             }
         }
 
         if (DateManager.getInstance().getDay() >= 40 && !registeredDays.get(40)) {
 
             registeredDays.replace(40, true);
-            if (this.recipes == null) this.recipes = new RecipeManager(this);
+            if (this.recipes == null)
+                this.recipes = new RecipeManager(this);
             this.recipes.registerRecipes();
             this.getNmsHandler().addMushrooms();
             getServer().getPluginManager().registerEvents(new SlotBlockListener(instance), instance);
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b40"));
+            Bukkit.getConsoleSender()
+                    .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b40"));
 
             if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
-                Bukkit.broadcastMessage(TextUtils.format(prefix + "&4&lNo se pudo registrar TheBeginning ya que no se ha encontrado el plugin &7WorldEdit"));
-                Bukkit.broadcastMessage(TextUtils.format(prefix + "&7Si necesitas soporte entra a este discord: &e" + Utils.SPIGOT_LINK));
+                Bukkit.broadcastMessage(TextUtils.format(prefix
+                        + "&4&lNo se pudo registrar TheBeginning ya que no se ha encontrado el plugin &7WorldEdit"));
+                Bukkit.broadcastMessage(TextUtils
+                        .format(prefix + "&7Si necesitas soporte entra a este discord: &e" + Utils.SPIGOT_LINK));
                 return;
             }
             this.beData = new BeginningDataManager(this);
             this.begginingManager = new BeginningManager(this);
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios de TheBeginning"));
+            Bukkit.getConsoleSender()
+                    .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios de TheBeginning"));
         }
 
         if (DateManager.getInstance().getDay() >= 50 && !registeredDays.get(50)) {
@@ -680,7 +748,8 @@ public final class Main extends JavaPlugin implements Listener {
                 this.recipes.registerRecipes();
             }
 
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b50"));
+            Bukkit.getConsoleSender()
+                    .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b50"));
             this.recipes.registerD50Recipes();
             registeredDays.replace(50, true);
         }
@@ -694,13 +763,23 @@ public final class Main extends JavaPlugin implements Listener {
             }
 
             this.recipes.registerD60Recipes();
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b60"));
+            Bukkit.getConsoleSender()
+                    .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b60"));
             registeredDays.replace(60, true);
+        }
+
+        if (DateManager.getInstance().getDay() >= 70 && !registeredDays.get(70)) {
+            this.craftingListener = new CraftingListener(this);
+            this.getServer().getPluginManager().registerEvents(this.craftingListener, this);
+            Bukkit.getConsoleSender()
+                    .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b70"));
+            registeredDays.replace(70, true);
         }
     }
 
     protected void registerChanges() {
-        if (alreadyRegisteredChanges) return;
+        if (alreadyRegisteredChanges)
+            return;
         alreadyRegisteredChanges = true;
     }
 
@@ -708,7 +787,8 @@ public final class Main extends JavaPlugin implements Listener {
 
         for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
 
-            if (off == null) return;
+            if (off == null)
+                return;
 
             PlayerDataManager manager = new PlayerDataManager(off.getName(), this);
             manager.generateDayData();
@@ -726,9 +806,12 @@ public final class Main extends JavaPlugin implements Listener {
                 }
             }
 
-            PDCLog.getInstance().log("[ERROR] Error al cargar el mundo principal, esto hará que los Death Train no se presenten.", true);
-            PDCLog.getInstance().log("[ERROR] Abre el archivo config.yml y establece el mundo principal en la opción: MainWorld", true);
-            PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + world.getName() + " como mundo principal.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Error al cargar el mundo principal, esto hará que los Death Train no se presenten.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Abre el archivo config.yml y establece el mundo principal en la opción: MainWorld", true);
+            PDCLog.getInstance()
+                    .log("[INFO] El plugin utilizará el mundo " + world.getName() + " como mundo principal.", true);
             PDCLog.getInstance().log("[INFO] Si deseas utilizar otro mundo, configura en el archivo config.yml.", true);
 
         } else {
@@ -737,13 +820,16 @@ public final class Main extends JavaPlugin implements Listener {
 
         if (Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.EndWorld"))) == null) {
 
-            PDCLog.getInstance().log("[ERROR] Error al cargar el mundo del end, esto hará que el end no funcione como debe.", true);
-            PDCLog.getInstance().log("[ERROR] Abre el archivo config.yml y establece el mundo del end en la opción: EndWorld", true);
+            PDCLog.getInstance()
+                    .log("[ERROR] Error al cargar el mundo del end, esto hará que el end no funcione como debe.", true);
+            PDCLog.getInstance().log(
+                    "[ERROR] Abre el archivo config.yml y establece el mundo del end en la opción: EndWorld", true);
 
             for (World w : Bukkit.getWorlds()) {
                 if (w.getEnvironment() == World.Environment.THE_END) {
                     this.endWorld = world;
-                    PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + w.getName() + " como mundo del End.", true);
+                    PDCLog.getInstance()
+                            .log("[INFO] El plugin utilizará el mundo " + w.getName() + " como mundo del End.", true);
                     break;
                 }
             }
@@ -753,7 +839,8 @@ public final class Main extends JavaPlugin implements Listener {
         }
 
         boolean dobleCap = getConfig().getBoolean("Toggles.Doble-Mob-Cap") && getDay() >= 10;
-        if (dobleCap) Bukkit.getConsoleSender().sendMessage(prefix + "&eDoblando la mob-cap en todos los mundos.");
+        if (dobleCap)
+            Bukkit.getConsoleSender().sendMessage(prefix + "&eDoblando la mob-cap en todos los mundos.");
 
         for (World w : Bukkit.getWorlds()) {
             if (dobleCap) {
@@ -791,9 +878,12 @@ public final class Main extends JavaPlugin implements Listener {
         setupWorld();
 
         sender.sendMessage(TextUtils.format("&aSe ha recargado el archivo de configuración y los mensajes."));
-        sender.sendMessage(TextUtils.format("&eAlgunos cambios pueden requerir un reinicio para funcionar correctamente."));
-        sender.sendMessage(TextUtils.format("&c&lNota importante: &7Algunos cambios pueden requerir un reinicio y la fecha puede no ser exacta."));
-        prefix = TextUtils.format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&c&lPERMADEATH&4&l &7➤ &f"));
+        sender.sendMessage(
+                TextUtils.format("&eAlgunos cambios pueden requerir un reinicio para funcionar correctamente."));
+        sender.sendMessage(TextUtils.format(
+                "&c&lNota importante: &7Algunos cambios pueden requerir un reinicio y la fecha puede no ser exacta."));
+        prefix = TextUtils.format(
+                (getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&c&lPERMADEATH&4&l &7➤ &f"));
 
         PDCLog.getInstance().log("Se ha recargado el plugin");
         DiscordPortal.reload();
@@ -882,8 +972,10 @@ public final class Main extends JavaPlugin implements Listener {
         c.set("TotemFail.ChatMessage", "&7¡El tótem de &c%player% &7ha fallado!");
         c.set("TotemFail.ChatMessageTotems", "&7¡Los tótems de &c%player% &7han fallado!");
         c.set("TotemFail.NotEnoughTotems", "&7¡%player% no tenía suficientes tótems en el inventario!");
-        c.set("TotemFail.PlayerUsedTotemMessage", "&7El jugador %player% ha consumido un tótem (Probabilidad: %totem_fail% %porcent% %number%)");
-        c.set("TotemFail.PlayerUsedTotemsMessage", "&7El jugador %player% ha consumido {ammount} tótems (Probabilidad: %totem_fail% %porcent% %number%)");
+        c.set("TotemFail.PlayerUsedTotemMessage",
+                "&7El jugador %player% ha consumido un tótem (Probabilidad: %totem_fail% %porcent% %number%)");
+        c.set("TotemFail.PlayerUsedTotemsMessage",
+                "&7El jugador %player% ha consumido {ammount} tótems (Probabilidad: %totem_fail% %porcent% %number%)");
         c.set("Worlds.MainWorld", "world");
         c.set("Worlds.EndWorld", "world_the_end");
         c.set("DontTouch.PlayTime", 0);
@@ -941,7 +1033,8 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     public void deathTrainEffects(LivingEntity entity) {
-        if (entity instanceof Player) return;
+        if (entity instanceof Player)
+            return;
 
         if (getDay() >= 25) {
 
@@ -959,6 +1052,10 @@ public final class Main extends JavaPlugin implements Listener {
 
     public SpawnListener getSpawnListener() {
         return spawnListener;
+    }
+
+    public CraftingListener getCraftingListener() {
+        return this.craftingListener;
     }
 
     public int getPlayTime() {

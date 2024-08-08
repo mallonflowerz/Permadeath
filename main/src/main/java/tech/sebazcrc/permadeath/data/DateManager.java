@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.log.PDCLog;
@@ -60,7 +59,7 @@ public class DateManager {
 
         if (this.currentDate.isBefore(now)) {
             this.currentDate = now;
-            resetCraftsPlayers();
+            instance.getCraftingListener().resetLimitCraft();
             DiscordPortal.onDayChange();
         }
     }
@@ -173,14 +172,6 @@ public class DateManager {
             e.printStackTrace();
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void resetCraftsPlayers() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            this.c.set(player.getUniqueId().toString(), 0);
-            saveFile();
-            reloadFile();
         }
     }
 

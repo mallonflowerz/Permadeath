@@ -12,6 +12,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.EntityAirChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -34,7 +35,6 @@ import tech.sebazcrc.permadeath.util.item.PermadeathItems;
 import tech.sebazcrc.permadeath.util.lib.HiddenStringUtils;
 import tech.sebazcrc.permadeath.util.lib.ItemBuilder;
 import tech.sebazcrc.permadeath.util.lib.UpdateChecker;
-import tech.sebazcrc.permadeath.data.DateManager;
 import tech.sebazcrc.permadeath.data.EndDataManager;
 import tech.sebazcrc.permadeath.data.PlayerDataManager;
 import tech.sebazcrc.permadeath.util.TextUtils;
@@ -51,8 +51,6 @@ public class PlayerListener implements Listener {
 
     long stormTicks;
     long stormHours;
-
-    private final int MAX_CRAFTS_PER_DAY = 15;
 
     public PlayerListener() {
         loadTicks();
@@ -882,6 +880,10 @@ public class PlayerListener implements Listener {
                         e.getPlayer().setSaturation(Math.max(newSaturation, 0));
                     }, 1L);
                 }
+
+                if (i.getType() == Material.GOLDEN_APPLE || i.getType() == Material.ENCHANTED_GOLDEN_APPLE) {
+                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 9)); // 40 ticks = 2 segundos
+                }
             }
         }
     }
@@ -1142,6 +1144,13 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onEnchant(PrepareItemEnchantEvent e) {
+        if (Main.getInstance().getDay() >= 70) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onCraftItem(CraftItemEvent e) {
         CraftingInventory inventory = e.getInventory();
 
@@ -1186,18 +1195,6 @@ public class PlayerListener implements Listener {
                         p.setItemOnCursor(res);
 
                     }
-                }
-            }
-
-            if (Main.getInstance().getDay() >= 70) {
-                DateManager manager = DateManager.getInstance();
-                String playerId = e.getWhoClicked().getUniqueId().toString();
-                int numCraft = manager.getConfig().getInt("LimitCraft." + playerId, 0);
-                if (numCraft >= MAX_CRAFTS_PER_DAY) {
-                    e.setCancelled(true);
-                    e.getWhoClicked().sendMessage("Has superado el limite de crafteos por dia.");
-                } else {
-                    manager.getConfig().set("LimitCraft." + playerId, numCraft + 1);
                 }
             }
         }

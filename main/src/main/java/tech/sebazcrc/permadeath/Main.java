@@ -447,6 +447,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             if (getDay() >= 70) {
                 getConfig().set("Toggles.Mike-Creeper-Spawn", false);
+                this.saveConfig();
             }
         }
     }

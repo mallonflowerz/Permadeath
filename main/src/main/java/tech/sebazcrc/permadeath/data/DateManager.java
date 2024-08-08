@@ -179,6 +179,8 @@ public class DateManager {
     private void resetCraftsPlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             this.c.set(player.getUniqueId().toString(), 0);
+            saveFile();
+            reloadFile();
         }
     }
 

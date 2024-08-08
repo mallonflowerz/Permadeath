@@ -907,7 +907,7 @@ public class PlayerListener implements Listener {
             if (e.getPlayer().isFlying()) {
                 ItemStack chestplate = e.getPlayer().getInventory().getChestplate();
                 ItemMeta meta = chestplate.getItemMeta();
-                if ((chestplate != null && chestplate.getType() == Material.ELYTRA) && 
+                if (chestplate != null && chestplate.getType() == Material.ELYTRA && 
                     meta.isUnbreakable() && ChatColor.stripColor(meta.getDisplayName())
                         .contains("Infernal")) {
                     if (new Random().nextInt(100000) < 1) {

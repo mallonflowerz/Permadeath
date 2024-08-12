@@ -349,7 +349,7 @@ public class PlayerListener implements Listener {
 
         if (Main.instance.getDay() >= 10) {
 
-            neededPlayers = 4;
+            neededPlayers = 2;
         }
 
         if (Bukkit.getOnlinePlayers().size() < neededPlayers) {

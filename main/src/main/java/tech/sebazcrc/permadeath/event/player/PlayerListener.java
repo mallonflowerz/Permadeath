@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Skull;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.enchantments.Enchantment;
@@ -12,6 +13,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.EntityAirChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -22,6 +24,7 @@ import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -32,6 +35,7 @@ import tech.sebazcrc.permadeath.util.Utils;
 import tech.sebazcrc.permadeath.util.item.InfernalNetherite;
 import tech.sebazcrc.permadeath.util.item.NetheriteArmor;
 import tech.sebazcrc.permadeath.util.item.PermadeathItems;
+import tech.sebazcrc.permadeath.util.lib.ElementalType;
 import tech.sebazcrc.permadeath.util.lib.HiddenStringUtils;
 import tech.sebazcrc.permadeath.util.lib.ItemBuilder;
 import tech.sebazcrc.permadeath.util.lib.UpdateChecker;
@@ -590,7 +594,7 @@ public class PlayerListener implements Listener {
         }, 20 * 20);
 
         if (!Main.optifineItemsEnabled())
-            player.setResourcePack(Utils.RESOURCE_PACK_LINK);
+            // player.setResourcePack(Utils.RESOURCE_PACK_LINK);
 
         if (Main.instance.getBeginningManager() != null
                 && Main.instance.getBeginningManager().getBeginningWorld() != null) {
@@ -882,7 +886,8 @@ public class PlayerListener implements Listener {
                 }
 
                 if (i.getType() == Material.GOLDEN_APPLE || i.getType() == Material.ENCHANTED_GOLDEN_APPLE) {
-                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 9)); // 40 ticks = 2 segundos
+                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 9)); // 40 ticks = 2
+                                                                                                   // segundos
                 }
             }
         }
@@ -906,16 +911,77 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         if (Main.getInstance().getDay() >= 70) {
-            if (e.getPlayer().isFlying()) {
+            if (e.getPlayer().isGliding()) {
                 ItemStack chestplate = e.getPlayer().getInventory().getChestplate();
                 ItemMeta meta = chestplate.getItemMeta();
-                if (chestplate != null && chestplate.getType() == Material.ELYTRA && 
-                    meta.isUnbreakable() && ChatColor.stripColor(meta.getDisplayName())
-                        .contains("Infernal")) {
+                if (chestplate != null && meta != null && chestplate.getType() == Material.ELYTRA &&
+                        !meta.isUnbreakable() && !ChatColor.stripColor(meta.getDisplayName())
+                                .contains("Infernal")) {
                     if (new Random().nextInt(100000) < 1) {
                         chestplate.setDurability((short) chestplate.getType().getMaxDurability());
                         e.getPlayer().getInventory().setChestplate(chestplate);
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (Main.getInstance().getDay() >= 70) {
+            if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null
+                    && Main.getInstance().getElementalSpawner() != null) {
+                if (e.getClickedBlock().getType() == Material.CHEST)
+                    return;
+                ItemStack ih = e.getPlayer().getInventory().getItemInMainHand();
+                if (ih.getType() == Material.EMERALD && ih.getItemMeta().isUnbreakable()) {
+                    Main.getInstance().getElementalSpawner().placeCustomBlock(Main.getInstance().getElementalSpawner()
+                            .blockFaceToLocation(e.getClickedBlock(), e.getBlockFace()), ElementalType.AIR);
+                    if (ih.getAmount() > 0) {
+                        ih.setAmount(ih.getAmount() - 1);
+                    } else {
+                        ih = null;
+                    }
+                    ItemStack finalIh = ih;
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
+                        e.getPlayer().getInventory().setItemInMainHand(finalIh);
+                        e.getPlayer().updateInventory();
+                    });
+                    e.setCancelled(true);
+                }
+            }
+
+            if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock() != null &&
+                    e.getClickedBlock().getType() == Material.SPAWNER
+                    && e.getPlayer().getWorld().getName().equalsIgnoreCase(Main.getInstance().world.getName())) {
+                ItemStack ih = e.getPlayer().getInventory().getItemInMainHand();
+                if (Main.getInstance().getElementalSpawner() != null
+                        && Main.getInstance().getElementalSpawner()
+                                .isElementalSpawner(e.getClickedBlock().getLocation())
+                        && ih.getType() == Material.DIAMOND) {
+                    e.getClickedBlock().getWorld().spawn(e.getClickedBlock().getLocation(), Spider.class);
+                    Location spawnLocation = e.getClickedBlock().getLocation();
+                    World world = spawnLocation.getWorld();
+
+                    // Ajustes de intensidad para partículas negras
+                    Particle.DustOptions blackDust = new Particle.DustOptions(Color.BLACK, 1.5F);
+                    world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, blackDust);
+
+                    // Ajustes de intensidad para partículas rojas
+                    Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 1.5F);
+                    world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, redDust);
+
+                    e.getClickedBlock().setType(Material.AIR);
+                    if (ih.getAmount() > 0) {
+                        ih.setAmount(ih.getAmount() - 1);
+                    } else {
+                        ih = null;
+                    }
+                    ItemStack finalIh = ih;
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
+                        e.getPlayer().getInventory().setItemInMainHand(finalIh);
+                        e.getPlayer().updateInventory();
+                    });
                 }
             }
         }

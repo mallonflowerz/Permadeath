@@ -3,6 +3,7 @@ package tech.sebazcrc.permadeath.util;
 import lombok.Getter;
 import org.bukkit.Location;
 import tech.sebazcrc.permadeath.util.interfaces.DeathModule;
+import tech.sebazcrc.permadeath.util.interfaces.ElementalSpawner;
 import tech.sebazcrc.permadeath.util.interfaces.InfernalNetheriteBlock;
 import tech.sebazcrc.permadeath.util.interfaces.NMSAccessor;
 import tech.sebazcrc.permadeath.util.interfaces.NMSHandler;
@@ -16,6 +17,8 @@ public class NMS {
     private static NMSHandler handler;
     @Getter
     private static InfernalNetheriteBlock netheriteBlock;
+    @Getter
+    private static ElementalSpawner elementalSpawner;
 
     private static Class<?> deathModuleClass;
     static {
@@ -34,6 +37,10 @@ public class NMS {
 
     public static void loadInfernalNetheriteBlock() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         netheriteBlock = (InfernalNetheriteBlock) Class.forName(search("block.InfernalNetheriteBlockImpl")).getConstructor().newInstance();
+    }
+
+    public static void loadElementalSpawnerBlock() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        elementalSpawner = (ElementalSpawner) Class.forName(search("block.ElementalSpawnerImpl")).getConstructor().newInstance();
     }
 
     public static String search(String classPath) {

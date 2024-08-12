@@ -13,6 +13,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import tech.sebazcrc.permadeath.util.NMS;
+import tech.sebazcrc.permadeath.util.item.ElementalItems;
 import tech.sebazcrc.permadeath.util.item.InfernalNetherite;
 import tech.sebazcrc.permadeath.util.item.NetheriteArmor;
 import tech.sebazcrc.permadeath.util.item.PermadeathItems;
@@ -599,7 +600,7 @@ public class PDCCommand implements CommandExecutor {
                     if (args.length == 1) {
 
                         p.sendMessage(TextUtils.format("&ePor favor introduce el ítem deseado"));
-                        p.sendMessage(TextUtils.format("&eEjemplos: &7medalla - netheriteArmor - infernalArmor - infernalBlock - netheriteTools - lifeOrb - endRelic - beginningRelic"));
+                        p.sendMessage(TextUtils.format("&eEjemplos: &7medalla - netheriteArmor - infernalArmor - elementalSpawner - infernalBlock - netheriteTools - lifeOrb - endRelic - beginningRelic"));
                         return false;
                     }
 
@@ -644,6 +645,9 @@ public class PDCCommand implements CommandExecutor {
                     } else if (s.toLowerCase().equalsIgnoreCase("infernalblock")) {
                         p.getInventory().addItem(PermadeathItems.craftInfernalNetheriteIngot());
                         p.sendMessage(TextUtils.format("&eHas recibido el Bloque de Netherite Infernal (comprueba no tener el inventario lleno)"));
+                    } else if (s.toLowerCase().equalsIgnoreCase("elementalSpawner")) {
+                        p.getInventory().addItem(ElementalItems.craftElementalSpawnerIngot());
+                        p.sendMessage(TextUtils.format("&eHas recibido el Bloque de Spawner Elemental (comprueba no tener el inventario lleno)"));
                     } else if (s.toLowerCase().equalsIgnoreCase("lifeorb")) {
                         p.getInventory().addItem(PermadeathItems.createLifeOrb());
                         p.sendMessage(TextUtils.format("&eHas recibido el Orbe de Vida (comprueba no tener el inventario lleno)"));
@@ -656,7 +660,7 @@ public class PDCCommand implements CommandExecutor {
                     } else {
 
                         p.sendMessage(TextUtils.format("&ePor favor introduce el ítem deseado"));
-                        p.sendMessage(TextUtils.format("&eEjemplos: &7medalla - netheriteArmor - infernalArmor - infernalBlock - netheriteTools - lifeOrb - endRelic - beginningRelic"));
+                        p.sendMessage(TextUtils.format("&eEjemplos: &7medalla - netheriteArmor - infernalArmor - infernalBlock - elementalSpawner - netheriteTools - lifeOrb - endRelic - beginningRelic"));
                     }
 
                 } else if (args[0].equalsIgnoreCase("afk")) {

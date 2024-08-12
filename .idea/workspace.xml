@@ -5,10 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c258de0-15eb-4332-920c-432539a8e632" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/PDCCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/PDCCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/data/DateManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/data/DateManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/entity/EntityEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/entity/EntityEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/entity/SpawnListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/entity/SpawnListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/player/CraftingListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/player/CraftingListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/player/PlayerListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/event/player/PlayerListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/util/NMS.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/util/NMS.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/util/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/util/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/util/interfaces/ElementalSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/java/tech/sebazcrc/permadeath/util/interfaces/ElementalSpawner.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

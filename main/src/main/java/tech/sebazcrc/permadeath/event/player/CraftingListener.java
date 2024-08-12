@@ -40,25 +40,30 @@ public class CraftingListener implements Listener {
 
     private void loadLimitCraft() {
         ConfigurationSection limitCraftSection = plugin.getConfig().getConfigurationSection(SECTION);
-        if (limitCraftSection != null) {
-            for (String uuid : limitCraftSection.getKeys(false)) {
-                countCrafts.put(uuid, limitCraftSection.getInt(uuid));
-            }
+        if (limitCraftSection == null) {
+            limitCraftSection = plugin.getConfig().createSection(SECTION);
         }
+        for (String uuid : limitCraftSection.getKeys(false)) {
+            countCrafts.put(uuid, limitCraftSection.getInt(uuid));
+        }
+        plugin.saveConfig();
     }
 
     public void saveLimitCraft() {
         ConfigurationSection limitCraftSection = plugin.getConfig().getConfigurationSection(SECTION);
-        if (limitCraftSection != null) {
-            countCrafts.forEach((key, value) -> limitCraftSection.set(key, value));
+        if (limitCraftSection == null) {
+            limitCraftSection = plugin.getConfig().createSection(SECTION);
         }
+        countCrafts.forEach(limitCraftSection::set);
+        plugin.saveConfig();
     }
 
     public void resetLimitCraft() {
         ConfigurationSection limitCraftSection = plugin.getConfig().getConfigurationSection(SECTION);
-        if (limitCraftSection != null) {
-            countCrafts.replaceAll((key, value) -> 0);
+        if (limitCraftSection == null) {
+            limitCraftSection = plugin.getConfig().createSection(SECTION);
         }
+        countCrafts.replaceAll((key, value) -> 0);
     }
 
 }

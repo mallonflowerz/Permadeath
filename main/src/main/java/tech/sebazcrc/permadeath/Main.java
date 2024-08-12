@@ -48,6 +48,7 @@ import tech.sebazcrc.permadeath.event.player.PlayerListener;
 import tech.sebazcrc.permadeath.event.player.SlotBlockListener;
 import tech.sebazcrc.permadeath.event.raid.RaidEvents;
 import tech.sebazcrc.permadeath.event.world.WorldEvents;
+import tech.sebazcrc.permadeath.util.interfaces.ElementalSpawner;
 import tech.sebazcrc.permadeath.util.interfaces.InfernalNetheriteBlock;
 import tech.sebazcrc.permadeath.util.interfaces.NMSAccessor;
 import tech.sebazcrc.permadeath.util.interfaces.NMSHandler;
@@ -128,6 +129,7 @@ public final class Main extends JavaPlugin implements Listener {
         instance = this;
         try {
             NMS.loadInfernalNetheriteBlock();
+            NMS.loadElementalSpawnerBlock();
             NMS.loadNMSAccessor();
             NMS.loadNMSHandler();
 
@@ -907,6 +909,7 @@ public final class Main extends JavaPlugin implements Listener {
         registeredDays.put(40, false);
         registeredDays.put(50, false);
         registeredDays.put(60, false);
+        registeredDays.put(70, false);
     }
 
     private void setupConsoleFilter() {
@@ -1026,6 +1029,10 @@ public final class Main extends JavaPlugin implements Listener {
 
     public InfernalNetheriteBlock getNetheriteBlock() {
         return NMS.getNetheriteBlock();
+    }
+
+    public ElementalSpawner getElementalSpawner() {
+        return NMS.getElementalSpawner();
     }
 
     public boolean isSmallIslandsEnabled() {

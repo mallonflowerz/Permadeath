@@ -96,7 +96,7 @@ public class EntityEvents implements Listener {
                 Player player = (Player) e.getEntity();
                 
                 if (e.getCause() == EntityDamageEvent.DamageCause.CONTACT) {
-                    player.setHealth(0);
+                    e.setDamage(Integer.MAX_VALUE);
                     return;
                 }
 

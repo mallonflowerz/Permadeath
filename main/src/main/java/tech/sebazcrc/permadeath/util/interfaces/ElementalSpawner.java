@@ -3,7 +3,8 @@ package tech.sebazcrc.permadeath.util.interfaces;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.event.block.BlockBreakEvent;
+
+import tech.sebazcrc.permadeath.util.lib.ElementalType;
 
 public interface ElementalSpawner {
     default Location blockFaceToLocation(Block block, BlockFace face) {
@@ -35,7 +36,7 @@ public interface ElementalSpawner {
         return loc;
     }
 
-    void placeCustomBlock(Location pos);
+    void placeCustomBlock(Location pos, ElementalType type);
 
-    void onBlockBreak(BlockBreakEvent e);
+    boolean isElementalSpawner(Location pos);
 }

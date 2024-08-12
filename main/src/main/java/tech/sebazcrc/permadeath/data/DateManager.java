@@ -125,6 +125,9 @@ public class DateManager {
 
     public void setNewDate(String value) {
         this.c.set("Fecha", value);
+        // if (!startDate.isEqual(LocalDate.now())) {
+        //     instance.getCraftingListener().resetLimitCraft();
+        // }
         saveFile();
         reloadFile();
     }

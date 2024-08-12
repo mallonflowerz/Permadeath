@@ -32,6 +32,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.Utils;
+import tech.sebazcrc.permadeath.util.item.ElementalItems;
 import tech.sebazcrc.permadeath.util.item.InfernalNetherite;
 import tech.sebazcrc.permadeath.util.item.NetheriteArmor;
 import tech.sebazcrc.permadeath.util.item.PermadeathItems;
@@ -596,26 +597,26 @@ public class PlayerListener implements Listener {
         if (!Main.optifineItemsEnabled())
             // player.setResourcePack(Utils.RESOURCE_PACK_LINK);
 
-        if (Main.instance.getBeginningManager() != null
-                && Main.instance.getBeginningManager().getBeginningWorld() != null) {
-            if (Main.instance.getBeginningManager().isClosed() && e.getPlayer().getWorld().getName()
-                    .equalsIgnoreCase(Main.instance.getBeginningManager().getBeginningWorld().getName())) {
-                e.getPlayer().teleport(Main.instance.world.getSpawnLocation());
-            }
-
-            if (Main.worldEditFound) {
-                if (!Main.instance.getBeData().generatedOverWorldBeginningPortal()) {
-                    Main.instance.getBeginningManager().generatePortal(true, null);
+            if (Main.instance.getBeginningManager() != null
+                    && Main.instance.getBeginningManager().getBeginningWorld() != null) {
+                if (Main.instance.getBeginningManager().isClosed() && e.getPlayer().getWorld().getName()
+                        .equalsIgnoreCase(Main.instance.getBeginningManager().getBeginningWorld().getName())) {
+                    e.getPlayer().teleport(Main.instance.world.getSpawnLocation());
                 }
 
-                if (!Main.instance.getBeData().generatedBeginningPortal()) {
-                    Main.instance.getBeginningManager().generatePortal(false,
-                            new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
-                    Main.instance.getBeginningManager().getBeginningWorld().setSpawnLocation(
-                            new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
+                if (Main.worldEditFound) {
+                    if (!Main.instance.getBeData().generatedOverWorldBeginningPortal()) {
+                        Main.instance.getBeginningManager().generatePortal(true, null);
+                    }
+
+                    if (!Main.instance.getBeData().generatedBeginningPortal()) {
+                        Main.instance.getBeginningManager().generatePortal(false,
+                                new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
+                        Main.instance.getBeginningManager().getBeginningWorld().setSpawnLocation(
+                                new Location(Main.instance.getBeginningManager().getBeginningWorld(), 50, 140, 50));
+                    }
                 }
             }
-        }
     }
 
     @EventHandler
@@ -955,22 +956,12 @@ public class PlayerListener implements Listener {
                     e.getClickedBlock().getType() == Material.SPAWNER
                     && e.getPlayer().getWorld().getName().equalsIgnoreCase(Main.getInstance().world.getName())) {
                 ItemStack ih = e.getPlayer().getInventory().getItemInMainHand();
+                ElementalType type = ElementalItems.extractElementalType(ih);
                 if (Main.getInstance().getElementalSpawner() != null
                         && Main.getInstance().getElementalSpawner()
                                 .isElementalSpawner(e.getClickedBlock().getLocation())
-                        && ih.getType() == Material.DIAMOND) {
-                    e.getClickedBlock().getWorld().spawn(e.getClickedBlock().getLocation(), Spider.class);
-                    Location spawnLocation = e.getClickedBlock().getLocation();
-                    World world = spawnLocation.getWorld();
-
-                    // Ajustes de intensidad para partículas negras
-                    Particle.DustOptions blackDust = new Particle.DustOptions(Color.BLACK, 1.5F);
-                    world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, blackDust);
-
-                    // Ajustes de intensidad para partículas rojas
-                    Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 1.5F);
-                    world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, redDust);
-
+                        && ih.getType() == Material.RED_DYE && type != null) {
+                    spawnByType(e.getClickedBlock().getLocation(), type);
                     e.getClickedBlock().setType(Material.AIR);
                     if (ih.getAmount() > 0) {
                         ih.setAmount(ih.getAmount() - 1);
@@ -1003,6 +994,30 @@ public class PlayerListener implements Listener {
                     }
                 }
             }
+        }
+    }
+
+    private void spawnByType(Location spawnLocation, ElementalType type) {
+        World world = spawnLocation.getWorld();
+
+        if (type == ElementalType.EARTH) {
+            world.spawn(spawnLocation, Spider.class);
+            // Ajustes de intensidad para partículas negras
+            Particle.DustOptions blackDust = new Particle.DustOptions(Color.BLACK, 1.5F);
+            world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, blackDust);
+
+            // Ajustes de intensidad para partículas rojas
+            Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 1.5F);
+            world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, redDust);
+        } else if (type == ElementalType.AIR) {
+            world.spawn(spawnLocation, Phantom.class);
+            // Ajustes de intensidad para partículas negras
+            Particle.DustOptions blackDust = new Particle.DustOptions(Color.BLACK, 1.5F);
+            world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, blackDust);
+
+            // Ajustes de intensidad para partículas rojas
+            Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 1.5F);
+            world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, redDust);
         }
     }
 

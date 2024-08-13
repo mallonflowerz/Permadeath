@@ -33,7 +33,7 @@ public class ElementalItems {
         int customModelData;
 
         if (type == ElementalType.AIR) {
-            displayName = "&fOrigen Elemental de Aire";
+            displayName = "&7Origen Elemental de Aire";
             customModelData = 1;
         } else if (type == ElementalType.EARTH) {
             displayName = "&2Origen Elemental de Tierra";

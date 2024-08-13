@@ -17,6 +17,7 @@ import tech.sebazcrc.permadeath.util.item.ElementalItems;
 import tech.sebazcrc.permadeath.util.item.InfernalNetherite;
 import tech.sebazcrc.permadeath.util.item.NetheriteArmor;
 import tech.sebazcrc.permadeath.util.item.PermadeathItems;
+import tech.sebazcrc.permadeath.util.lib.ElementalType;
 import tech.sebazcrc.permadeath.util.lib.ItemBuilder;
 import tech.sebazcrc.permadeath.data.DateManager;
 import tech.sebazcrc.permadeath.data.PlayerDataManager;
@@ -657,6 +658,16 @@ public class PDCCommand implements CommandExecutor {
                     } else if (s.toLowerCase().equalsIgnoreCase("beginningrelic")) {
                         p.getInventory().addItem(PermadeathItems.createBeginningRelic());
                         p.sendMessage(TextUtils.format("&eHas recibido la Reliquia del Comienzo (comprueba no tener el inventario lleno)"));
+                    } else if (s.toLowerCase().equalsIgnoreCase("elementalEggs")) {
+
+                        p.getInventory().addItem(ElementalItems.createEggElementalByType(ElementalType.AIR));
+                        p.getInventory().addItem(ElementalItems.createEggElementalByType(ElementalType.EARTH));
+                        p.getInventory().addItem(ElementalItems.createEggElementalByType(ElementalType.ENERGY));
+                        p.getInventory().addItem(ElementalItems.createEggElementalByType(ElementalType.FIRE));
+                        p.getInventory().addItem(ElementalItems.createEggElementalByType(ElementalType.WATER));
+
+                        p.sendMessage(TextUtils.format("&eHas recibido los Elemental Eggs (comprueba no tener el inventario lleno)"));
+
                     } else {
 
                         p.sendMessage(TextUtils.format("&ePor favor introduce el ítem deseado"));

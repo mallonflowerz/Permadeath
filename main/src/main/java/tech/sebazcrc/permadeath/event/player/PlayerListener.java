@@ -405,7 +405,7 @@ public class PlayerListener implements Listener {
 
             Bukkit.getOnlinePlayers().forEach(p -> {
 
-                String msg = Main.getInstance().getMessages().getMessage("Sleeping", p).replace("%needed%", String.valueOf(4)).replace("%players%", String.valueOf(globalSleeping.size())).replace("%player%", player.getName());
+                String msg = Main.getInstance().getMessages().getMessage("Sleeping", p).replace("%needed%", String.valueOf(2)).replace("%players%", String.valueOf(globalSleeping.size())).replace("%player%", player.getName());
 
                 p.sendMessage(msg);
 
@@ -419,7 +419,7 @@ public class PlayerListener implements Listener {
                     @Override
                     public void run() {
 
-                        if (globalSleeping.size() >= 4) {
+                        if (globalSleeping.size() >= 2) {
 
                             event.getPlayer().getWorld().setTime(0L);
 

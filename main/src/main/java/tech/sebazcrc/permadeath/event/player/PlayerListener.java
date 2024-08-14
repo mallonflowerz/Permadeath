@@ -961,7 +961,7 @@ public class PlayerListener implements Listener {
                         && Main.getInstance().getElementalSpawner()
                                 .isElementalSpawner(e.getClickedBlock().getLocation())
                         && ih.getType() == Material.RED_DYE && type != null) {
-                    spawnByType(e.getClickedBlock().getLocation(), type);
+                    spawnByType(e.getPlayer(), e.getClickedBlock().getLocation(), type);
                     e.getClickedBlock().setType(Material.AIR);
                     if (ih.getAmount() > 0) {
                         ih.setAmount(ih.getAmount() - 1);
@@ -997,11 +997,21 @@ public class PlayerListener implements Listener {
         }
     }
 
-    private void spawnByType(Location spawnLocation, ElementalType type) {
+    private void spawnByType(Player player, Location spawnLocation, ElementalType type) {
         World world = spawnLocation.getWorld();
 
         if (type == ElementalType.EARTH) {
-            world.spawn(spawnLocation, Spider.class);
+            if (Main.getInstance().getElementalSpider().getIsDead()) {
+                player.sendMessage("&eLa Elemental de Tierra ha muerto en &3"
+                        + Main.getInstance().getElementalSpider().getCoors());
+                return;
+            }
+            boolean spawnSuccess = Main.getInstance().getElementalSpider().spawnElementalSpider(spawnLocation);
+            if (!spawnSuccess) {
+                player.sendMessage("&eYa está la Elemental de Tierra invocada en &3"
+                        + Main.getInstance().getElementalSpider().getCoors());
+                return;
+            }
             // Ajustes de intensidad para partículas negras
             Particle.DustOptions blackDust = new Particle.DustOptions(Color.BLACK, 1.5F);
             world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, blackDust);

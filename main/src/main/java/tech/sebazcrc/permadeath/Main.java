@@ -1,6 +1,7 @@
 package tech.sebazcrc.permadeath;
 
 import lombok.Getter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,7 @@ import tech.sebazcrc.permadeath.end.EndManager;
 import tech.sebazcrc.permadeath.event.block.BlockListener;
 import tech.sebazcrc.permadeath.event.entity.EntityEvents;
 import tech.sebazcrc.permadeath.util.mob.CustomSkeletons;
+import tech.sebazcrc.permadeath.util.mob.elementals.ElementalSpider;
 import tech.sebazcrc.permadeath.event.entity.SpawnListener;
 import tech.sebazcrc.permadeath.event.entity.TotemListener;
 import tech.sebazcrc.permadeath.event.HostileEntityListener;
@@ -100,6 +102,8 @@ public final class Main extends JavaPlugin implements Listener {
     private LifeOrbEvent orbEvent;
     private SpawnListener spawnListener;
     private CraftingListener craftingListener;
+    private ElementalSpider elementalSpider;
+    private BukkitAudiences adventure;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null)
@@ -110,6 +114,7 @@ public final class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
+        this.adventure = BukkitAudiences.create(this);
 
         this.saveDefaultConfig();
         setupConsoleFilter();
@@ -156,6 +161,11 @@ public final class Main extends JavaPlugin implements Listener {
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("             &c&lPERMADEATH"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("     &7- Desactivando el Plugin."));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
+
+        if (this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
 
         this.instance = null;
     }
@@ -772,7 +782,9 @@ public final class Main extends JavaPlugin implements Listener {
 
         if (DateManager.getInstance().getDay() >= 70 && !registeredDays.get(70)) {
             this.craftingListener = new CraftingListener(this);
+            this.elementalSpider = new ElementalSpider(this);
             this.getServer().getPluginManager().registerEvents(this.craftingListener, this);
+            this.getServer().getPluginManager().registerEvents(this.elementalSpider, this);
             Bukkit.getConsoleSender()
                     .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b70"));
             registeredDays.replace(70, true);
@@ -1035,6 +1047,10 @@ public final class Main extends JavaPlugin implements Listener {
         return NMS.getElementalSpawner();
     }
 
+    public ElementalSpider getElementalSpider() {
+        return this.elementalSpider;
+    }
+
     public boolean isSmallIslandsEnabled() {
         return true;
     }
@@ -1071,5 +1087,12 @@ public final class Main extends JavaPlugin implements Listener {
 
     public void setPlayTime(int playTime) {
         this.playTime = playTime;
+    }
+
+    public BukkitAudiences adventure() {
+        if (this.adventure == null) {
+            throw new IllegalStateException("Access not found");
+        }
+        return this.adventure;
     }
 }

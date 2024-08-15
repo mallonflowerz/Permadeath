@@ -1,7 +1,10 @@
 package tech.sebazcrc.permadeath.util.mob.elementals;
 
+import static tech.sebazcrc.permadeath.util.Utils.format;
+
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -39,8 +42,9 @@ import org.bukkit.util.Vector;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.BarBoss;
 import tech.sebazcrc.permadeath.util.Utils;
+import tech.sebazcrc.permadeath.util.interfaces.ElementalMob;
 
-public class ElementalSpider implements Listener {
+public class ElementalSpider implements Listener, ElementalMob {
 
     private final Main plugin;
     private final Random RANDOM = new Random();
@@ -52,7 +56,7 @@ public class ElementalSpider implements Listener {
 
     private final Map<Spider, Double> spiderHealth = new HashMap<>();
     private final Set<Spider> affectedSpiders = new HashSet<>();
-    private final double MAX_HEALTH = 400.0;
+    private final double MAX_HEALTH = 600.0;
 
     private NamespacedKey spiderKey;
 
@@ -64,7 +68,8 @@ public class ElementalSpider implements Listener {
         loadConfig();
     }
 
-    public boolean spawnElementalSpider(Location location) {
+    @Override
+    public boolean spawnElemental(Location location) {
         if (this.spiderActive || this.isDead)
             return false;
         Spider spider = location.getWorld().spawn(location, Spider.class);
@@ -73,7 +78,7 @@ public class ElementalSpider implements Listener {
         spider.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(14.0);
         spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(32.0);
         spider.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.7);
-        spider.setCustomName("Elemental Spider");
+        spider.setCustomName(format("&2Elemental Spider"));
         spider.setCustomNameVisible(false);
         spider.getPersistentDataContainer().set(spiderKey, PersistentDataType.BYTE,
                 (byte) 1);
@@ -85,22 +90,27 @@ public class ElementalSpider implements Listener {
         return true;
     }
 
-    private void showBossBar(Location location) {
-        this.bossBar.createBar("&2Elemental de Tierra", BarColor.GREEN, BarStyle.SOLID);
-        this.bossBar.addPlayers(Utils.getNearbyPlayers(location, 15.0));
-        Bukkit.getConsoleSender().sendMessage("&cLa batalla ha comenzado...");
+    @Override
+    public void showBossBar(Location location) {
+        this.bossBar.createBar(format("&2Elemental de Tierra"), BarColor.GREEN, BarStyle.SOLID);
+        List<Player> nearby = Utils.getNearbyPlayers(location, 15.0);
+        this.bossBar.addPlayers(nearby);
+        this.bossBar.setProgress(MAX_HEALTH); 
+        nearby.forEach(p -> p.sendMessage(format("&cLa batalla ha comenzado...")));
     }
 
-    private void hideBossBar() {
+    @Override
+    public void hideBossBar() {
         this.bossBar.setVisible(false);
     }
 
-    private boolean isElementalSpider(Entity entity) {
+    @Override
+    public boolean isElemental(Entity entity) {
         if (entity instanceof Spider) {
             Spider spider = (Spider) entity;
             PersistentDataContainer data = spider.getPersistentDataContainer();
             if (data.has(spiderKey, PersistentDataType.BYTE) && spider.getCustomName() != null
-                    && spider.getCustomName().equalsIgnoreCase("Elemental Spider")) {
+                    && spider.getCustomName().contains("Elemental Spider")) {
                 return true;
             }
         }
@@ -115,10 +125,10 @@ public class ElementalSpider implements Listener {
         Entity damager = event.getDamager();
         Entity target = event.getEntity();
 
-        if (RANDOM.nextInt(100) < 30) {
+        if (RANDOM.nextInt(100) < 20) {
             if (event.getCause() == DamageCause.ENTITY_ATTACK) {
                 // Check if the damager is a spider and the target is a player
-                if (isElementalSpider(damager) && target instanceof Player) {
+                if (isElemental(damager) && target instanceof Player) {
                     Player player = (Player) target;
 
                     // Get the player's location
@@ -130,8 +140,8 @@ public class ElementalSpider implements Listener {
             }
         }
 
-        if (RANDOM.nextInt(100) < 50) {
-            if (damager instanceof Arrow && isElementalSpider(target)) {
+        if (RANDOM.nextInt(100) < 30) {
+            if (damager instanceof Arrow && isElemental(target)) {
                 Arrow arrow = (Arrow) event.getDamager();
                 if (arrow.getShooter() instanceof Player) {
                     Player player = (Player) arrow.getShooter();
@@ -142,7 +152,7 @@ public class ElementalSpider implements Listener {
         }
 
         if (RANDOM.nextInt(100) < 25) {
-            if (damager instanceof Player && isElementalSpider(target)) {
+            if (damager instanceof Player && isElemental(target)) {
                 Location spiderLocation = target.getLocation();
                 spiderLocation.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, spiderLocation, 1);
                 // Empujar al jugador lejos de la araña
@@ -153,15 +163,15 @@ public class ElementalSpider implements Listener {
             }
         }
 
-        if (RANDOM.nextInt(100) < 40) {
-            if (damager instanceof Player && isElementalSpider(target)) {
+        if (RANDOM.nextInt(100) < 25) {
+            if (damager instanceof Player && isElemental(target)) {
                 Player player = (Player) damager;
                 player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 10 * 20, 3));
             }
         }
 
         if (RANDOM.nextInt(100) < 2) {
-            if (isElementalSpider(target)) {
+            if (isElemental(target)) {
                 createDisappearEffect(target);
                 this.spiderActive = false;
             }
@@ -172,7 +182,7 @@ public class ElementalSpider implements Listener {
     public void onSpiderDamage(EntityDamageEvent event) {
         if (this.isDead)
             return;
-        if (isElementalSpider(event.getEntity())) {
+        if (isElemental(event.getEntity())) {
             Spider spider = (Spider) event.getEntity();
             double currentHealth = spider.getHealth();
             double maxHealth = spider.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
@@ -198,7 +208,7 @@ public class ElementalSpider implements Listener {
             // Update the spider's health
             spiderHealth.put(spider, currentHealth);
 
-            if (RANDOM.nextInt(100) < 18) {
+            if (RANDOM.nextInt(100) < 14) {
                 spider.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10 * 20, 1));
                 spider.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 10 * 20, 1));
                 spider.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
@@ -209,7 +219,7 @@ public class ElementalSpider implements Listener {
                 spider.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
             }
 
-            if (RANDOM.nextInt(100) < 6) {
+            if (RANDOM.nextInt(100) < 4) {
                 Location spiderLocation = spider.getLocation();
                 spawnMobsAroundSpider(spiderLocation, RANDOM.nextInt(10) + 1);
             }
@@ -221,7 +231,7 @@ public class ElementalSpider implements Listener {
     public void onSpiderDeath(EntityDeathEvent event) {
         if (this.isDead)
             return;
-        if (isElementalSpider(event.getEntity())) {
+        if (isElemental(event.getEntity())) {
             Spider spider = (Spider) event.getEntity();
             markDeath(spider);
         }
@@ -236,7 +246,7 @@ public class ElementalSpider implements Listener {
         }
         confirmDeath();
         hideBossBar();
-        Bukkit.getConsoleSender().sendMessage("&eLa Elemental de Tierra ha muerto en &3" + this.coorsSpider);
+        Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(format("&eLa Elemental de Tierra ha muerto en &3") + this.coorsSpider));
     }
 
     private void createDisappearEffect(Entity spider) {
@@ -339,11 +349,12 @@ public class ElementalSpider implements Listener {
         for (int i = 0; i < numberOfMobs; i++) {
             Location spawnLocation = location.clone().add(RANDOM.nextDouble() * 5 - 2.5, 0,
                     RANDOM.nextDouble() * 5 - 2.5);
-            world.spawnEntity(spawnLocation, types[RANDOM.nextInt(types.length)]); // Puedes cambiar el tipo de mob aquí
+            world.spawnEntity(spawnLocation, types[RANDOM.nextInt(types.length)]);
         }
     }
 
-    private void loadConfig() {
+    @Override
+    public void loadConfig() {
         ConfigurationSection section = plugin.getConfig().getConfigurationSection(SECTION);
         if (section == null) {
             section = plugin.getConfig().createSection(SECTION);
@@ -357,7 +368,8 @@ public class ElementalSpider implements Listener {
         this.coorsSpider = section.getString("Coors", "No disponibles");
     }
 
-    private void confirmDeath() {
+    @Override
+    public void confirmDeath() {
         ConfigurationSection section = plugin.getConfig().getConfigurationSection(SECTION);
         if (section != null) {
             this.isDead = true;
@@ -368,6 +380,7 @@ public class ElementalSpider implements Listener {
         }
     }
 
+    @Override
     public void saveConfigElemental() {
         ConfigurationSection section = plugin.getConfig().getConfigurationSection(SECTION);
         if (section != null) {

@@ -1,5 +1,7 @@
 package tech.sebazcrc.permadeath.event.player;
 
+import static tech.sebazcrc.permadeath.util.Utils.format;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -1002,13 +1004,13 @@ public class PlayerListener implements Listener {
 
         if (type == ElementalType.EARTH) {
             if (Main.getInstance().getElementalSpider().getIsDead()) {
-                player.sendMessage("&eLa Elemental de Tierra ha muerto en &3"
+                player.sendMessage(format("&eLa Elemental de Tierra ha muerto en &3")
                         + Main.getInstance().getElementalSpider().getCoors());
                 return;
             }
-            boolean spawnSuccess = Main.getInstance().getElementalSpider().spawnElementalSpider(spawnLocation);
+            boolean spawnSuccess = Main.getInstance().getElementalSpider().spawnElemental(spawnLocation);
             if (!spawnSuccess) {
-                player.sendMessage("&eYa está la Elemental de Tierra invocada en &3"
+                player.sendMessage(format("&eYa está la Elemental de Tierra invocada en &3")
                         + Main.getInstance().getElementalSpider().getCoors());
                 return;
             }

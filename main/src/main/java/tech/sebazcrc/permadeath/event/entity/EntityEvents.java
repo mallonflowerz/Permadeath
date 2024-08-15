@@ -100,7 +100,7 @@ public class EntityEvents implements Listener {
                     return;
                 }
 
-                if (e.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+                if (e.getCause() == EntityDamageEvent.DamageCause.LAVA && Main.getInstance().getDay() >= 80) {
                     // Multiplicar el daño por 5
                     double originalDamage = e.getDamage();
                     double increasedDamage = originalDamage * 5;

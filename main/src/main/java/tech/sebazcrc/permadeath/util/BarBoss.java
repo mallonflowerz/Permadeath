@@ -3,7 +3,6 @@ package tech.sebazcrc.permadeath.util;
 import java.util.*;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -24,7 +23,7 @@ public class BarBoss {
     }
 
     public void createBar(String title, BarColor color, BarStyle style) {
-        this.bar = Bukkit.createBossBar(format(title), color, style);
+        this.bar = Bukkit.createBossBar(Utils.format(title), color, style);
         this.bar.setVisible(true);
     }
 
@@ -36,7 +35,4 @@ public class BarBoss {
         this.bar.setVisible(v);
     }
 
-    private String format(String chain) {
-        return ChatColor.translateAlternateColorCodes('&', chain);
-    }
 }

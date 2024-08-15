@@ -1,7 +1,12 @@
 package tech.sebazcrc.permadeath.util;
 
+import java.util.*;
+
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Utils {
@@ -35,5 +40,15 @@ public class Utils {
 
     public static int getExperienceTotalFromLevels(int levels) {
         return 2 * levels * levels + 3 * levels;
+    }
+
+    public static List<Player> getNearbyPlayers(Location location, double radius) {
+        List<Player> players = new ArrayList<>();
+        for (Entity entity : location.getWorld().getNearbyEntities(location, radius, radius, radius)) {
+            if (entity instanceof Player) {
+                players.add((Player) entity);
+            }
+        }
+        return players;
     }
 }

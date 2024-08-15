@@ -14,6 +14,8 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -34,13 +36,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.bossbar.BossBar.Color;
-import net.kyori.adventure.bossbar.BossBar.Overlay;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import tech.sebazcrc.permadeath.Main;
+import tech.sebazcrc.permadeath.util.BarBoss;
+import tech.sebazcrc.permadeath.util.Utils;
 
 public class ElementalSpider implements Listener {
 
@@ -49,30 +47,27 @@ public class ElementalSpider implements Listener {
     private boolean isDead;
     private boolean spiderActive;
     private String coorsSpider;
-    private BossBar spiderBossBar;
-    private Audience audience;
+    private BarBoss bossBar;
     public final static String SECTION = "ElementalSpider";
 
     private final Map<Spider, Double> spiderHealth = new HashMap<>();
     private final Set<Spider> affectedSpiders = new HashSet<>();
-    private final double MAX_HEALTH = 40.0;
+    private final double MAX_HEALTH = 400.0;
 
     private NamespacedKey spiderKey;
 
     public ElementalSpider(Main instance) {
         plugin = instance;
+        bossBar = new BarBoss();
         spiderKey = new NamespacedKey(instance, "elemental_spider");
 
         loadConfig();
-        audience = this.plugin.adventure().players();
-        spiderBossBar = BossBar.bossBar(Component.text("Elemental de Tierra").color(NamedTextColor.DARK_GREEN),
-                (float) MAX_HEALTH, Color.GREEN, Overlay.NOTCHED_6);
     }
 
     public boolean spawnElementalSpider(Location location) {
-        if (this.spiderActive || this.isDead || !this.coorsSpider.isEmpty())
+        if (this.spiderActive || this.isDead)
             return false;
-        Spider spider = location.getWorld().spawn(location.clone(), Spider.class);
+        Spider spider = location.getWorld().spawn(location, Spider.class);
         spider.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(MAX_HEALTH);
         spider.setHealth(MAX_HEALTH);
         spider.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(14.0);
@@ -83,20 +78,21 @@ public class ElementalSpider implements Listener {
         spider.getPersistentDataContainer().set(spiderKey, PersistentDataType.BYTE,
                 (byte) 1);
         spider.setRemoveWhenFarAway(false);
-        showBossBar();
+        showBossBar(location);
         this.spiderActive = true;
-        this.coorsSpider = String.format("%s %s %s", location.clone().getX(), location.clone().getY(),
-                location.clone().getZ());
+        this.coorsSpider = String.format("%s %s %s", location.getX(), location.getY(),
+                location.getZ());
         return true;
     }
 
-    private void showBossBar() {
-        audience.showBossBar(spiderBossBar);
+    private void showBossBar(Location location) {
+        this.bossBar.createBar("&2Elemental de Tierra", BarColor.GREEN, BarStyle.SOLID);
+        this.bossBar.addPlayers(Utils.getNearbyPlayers(location, 15.0));
         Bukkit.getConsoleSender().sendMessage("&cLa batalla ha comenzado...");
     }
 
     private void hideBossBar() {
-        audience.hideBossBar(spiderBossBar);
+        this.bossBar.setVisible(false);
     }
 
     private boolean isElementalSpider(Entity entity) {
@@ -161,11 +157,10 @@ public class ElementalSpider implements Listener {
             if (damager instanceof Player && isElementalSpider(target)) {
                 Player player = (Player) damager;
                 player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 10 * 20, 3));
-                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 1));
             }
         }
 
-        if (RANDOM.nextInt(100) < 8) {
+        if (RANDOM.nextInt(100) < 2) {
             if (isElementalSpider(target)) {
                 createDisappearEffect(target);
                 this.spiderActive = false;
@@ -193,7 +188,7 @@ public class ElementalSpider implements Listener {
 
             // Actualizar la barra de jefe según la salud restante
             float healthPercentage = (float) (currentHealth / maxHealth);
-            spiderBossBar.progress(healthPercentage); // Actualizar la barra de jefe
+            this.bossBar.setProgress(healthPercentage); // Actualizar la barra de jefe
 
             // Check if health has dropped below the threshold
             if (previousHealth > healthThreshold && currentHealth <= healthThreshold) {
@@ -214,7 +209,7 @@ public class ElementalSpider implements Listener {
                 spider.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0));
             }
 
-            if (RANDOM.nextInt(100) < 15) {
+            if (RANDOM.nextInt(100) < 6) {
                 Location spiderLocation = spider.getLocation();
                 spawnMobsAroundSpider(spiderLocation, RANDOM.nextInt(10) + 1);
             }
@@ -255,6 +250,7 @@ public class ElementalSpider implements Listener {
             public void run() {
                 if (ticks >= 20) { // Effect lasts for 1 second (20 ticks)
                     spider.remove(); // Remove the spider after the effect
+                    hideBossBar();
                     cancel();
                     return;
                 }
@@ -368,6 +364,7 @@ public class ElementalSpider implements Listener {
             this.spiderActive = false;
             section.set("Death", true);
             section.set("Active", false);
+            section.set("Coors", this.coorsSpider);
         }
     }
 

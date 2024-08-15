@@ -1,7 +1,6 @@
 package tech.sebazcrc.permadeath;
 
 import lombok.Getter;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.logging.log4j.LogManager;
@@ -103,7 +102,6 @@ public final class Main extends JavaPlugin implements Listener {
     private SpawnListener spawnListener;
     private CraftingListener craftingListener;
     private ElementalSpider elementalSpider;
-    private BukkitAudiences adventure;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null)
@@ -114,18 +112,17 @@ public final class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        this.adventure = BukkitAudiences.create(this);
-
+        
         this.saveDefaultConfig();
         setupConsoleFilter();
-
+        
         prefix = TextUtils
-                .format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&cPermadeath &7➤ &f"));
-
+        .format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&cPermadeath &7➤ &f"));
+        
         tickAll();
-
+        
         this.playTime = getConfig().getInt("DontTouch.PlayTime");
-
+        
         Utils.initializeKeys(this);
     }
 
@@ -150,6 +147,9 @@ public final class Main extends JavaPlugin implements Listener {
         if (this.craftingListener != null) {
             this.craftingListener.saveLimitCraft();
         }
+        if (this.elementalSpider != null) {
+            this.elementalSpider.saveConfigElemental();
+        }
 
         getConfig().set("DontTouch.PlayTime", this.playTime);
         saveConfig();
@@ -161,11 +161,6 @@ public final class Main extends JavaPlugin implements Listener {
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("             &c&lPERMADEATH"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("     &7- Desactivando el Plugin."));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
-
-        if (this.adventure != null) {
-            this.adventure.close();
-            this.adventure = null;
-        }
 
         this.instance = null;
     }
@@ -1087,12 +1082,5 @@ public final class Main extends JavaPlugin implements Listener {
 
     public void setPlayTime(int playTime) {
         this.playTime = playTime;
-    }
-
-    public BukkitAudiences adventure() {
-        if (this.adventure == null) {
-            throw new IllegalStateException("Access not found");
-        }
-        return this.adventure;
     }
 }

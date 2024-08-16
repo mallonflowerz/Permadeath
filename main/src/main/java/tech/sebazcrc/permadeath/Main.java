@@ -38,14 +38,12 @@ import tech.sebazcrc.permadeath.end.EndManager;
 import tech.sebazcrc.permadeath.event.block.BlockListener;
 import tech.sebazcrc.permadeath.event.entity.EntityEvents;
 import tech.sebazcrc.permadeath.util.mob.CustomSkeletons;
-import tech.sebazcrc.permadeath.util.mob.elementals.ElementalGhast;
-import tech.sebazcrc.permadeath.util.mob.elementals.ElementalSpider;
 import tech.sebazcrc.permadeath.event.entity.SpawnListener;
 import tech.sebazcrc.permadeath.event.entity.TotemListener;
+import tech.sebazcrc.permadeath.event.ElementalGestion;
 import tech.sebazcrc.permadeath.event.HostileEntityListener;
 import tech.sebazcrc.permadeath.event.paper.PaperListeners;
 import tech.sebazcrc.permadeath.event.player.AnvilListener;
-import tech.sebazcrc.permadeath.event.player.CraftingListener;
 import tech.sebazcrc.permadeath.event.player.PlayerListener;
 import tech.sebazcrc.permadeath.event.player.SlotBlockListener;
 import tech.sebazcrc.permadeath.event.raid.RaidEvents;
@@ -102,9 +100,7 @@ public final class Main extends JavaPlugin implements Listener {
     private LifeOrbEvent orbEvent;
     private SpawnListener spawnListener;
 
-    private CraftingListener craftingListener;
-    private ElementalSpider elementalSpider;
-    private ElementalGhast elementalGhast;
+    private ElementalGestion elementalGestion;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null)
@@ -115,17 +111,17 @@ public final class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        
+
         this.saveDefaultConfig();
         setupConsoleFilter();
-        
+
         prefix = TextUtils
-        .format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&cPermadeath &7➤ &f"));
-        
+                .format((getConfig().contains("Prefix") ? getConfig().getString("Prefix") : "&cPermadeath &7➤ &f"));
+
         tickAll();
-        
+
         this.playTime = getConfig().getInt("DontTouch.PlayTime");
-        
+
         Utils.initializeKeys(this);
     }
 
@@ -147,16 +143,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        if (this.craftingListener != null) {
-            this.craftingListener.saveLimitCraft();
-        }
-        if (this.elementalSpider != null) {
-            this.elementalSpider.saveConfigElemental();
-        }
-        if (this.elementalGhast != null) {
-            this.elementalGhast.saveConfigElemental();
-        }
-
+        this.elementalGestion.onDis();
         getConfig().set("DontTouch.PlayTime", this.playTime);
         saveConfig();
         reloadConfig();
@@ -782,12 +769,7 @@ public final class Main extends JavaPlugin implements Listener {
         }
 
         if (DateManager.getInstance().getDay() >= 70 && !registeredDays.get(70)) {
-            this.craftingListener = new CraftingListener(this);
-            this.elementalSpider = new ElementalSpider(this);
-            this.elementalGhast = new ElementalGhast(this);
-            this.getServer().getPluginManager().registerEvents(this.craftingListener, this);
-            this.getServer().getPluginManager().registerEvents(this.elementalSpider, this);
-            this.getServer().getPluginManager().registerEvents(this.elementalGhast, this);
+            this.elementalGestion = new ElementalGestion(this);
             Bukkit.getConsoleSender()
                     .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b70"));
             registeredDays.replace(70, true);
@@ -1050,12 +1032,8 @@ public final class Main extends JavaPlugin implements Listener {
         return NMS.getElementalSpawner();
     }
 
-    public ElementalSpider getElementalSpider() {
-        return this.elementalSpider;
-    }
-
-    public ElementalGhast getElementalGhast() {
-        return this.elementalGhast;
+    public ElementalGestion getElementalGestion() {
+        return this.elementalGestion;
     }
 
     public boolean isSmallIslandsEnabled() {
@@ -1082,10 +1060,6 @@ public final class Main extends JavaPlugin implements Listener {
 
     public SpawnListener getSpawnListener() {
         return spawnListener;
-    }
-
-    public CraftingListener getCraftingListener() {
-        return this.craftingListener;
     }
 
     public int getPlayTime() {

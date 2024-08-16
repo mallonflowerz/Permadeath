@@ -1,6 +1,6 @@
 package tech.sebazcrc.permadeath.util.mob.elementals;
 
-import static tech.sebazcrc.permadeath.util.Utils.format;
+import static tech.sebazcrc.permadeath.util.TextUtils.format;
 
 import java.util.List;
 import java.util.Random;
@@ -20,9 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Spider;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -31,7 +29,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -41,6 +38,8 @@ import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.BarBoss;
 import tech.sebazcrc.permadeath.util.Utils;
 import tech.sebazcrc.permadeath.util.interfaces.ElementalMob;
+import tech.sebazcrc.permadeath.util.item.ElementalItems;
+import tech.sebazcrc.permadeath.util.lib.ElementalType;
 
 public class ElementalGhast implements Listener, ElementalMob {
 
@@ -259,7 +258,6 @@ public class ElementalGhast implements Listener, ElementalMob {
                 Ghast ghast = (Ghast) fireball.getShooter();
                 if (isElemental(ghast)) {
                     fireball.setYield((float) RANDOM.nextInt(100));
-
                 }
             }
         }
@@ -270,8 +268,11 @@ public class ElementalGhast implements Listener, ElementalMob {
         if (this.isDead)
             return;
         if (isElemental(event.getEntity())) {
-            Ghast spider = (Ghast) event.getEntity();
-            markDeath(spider);
+            Ghast ghast = (Ghast) event.getEntity();
+            event.setDroppedExp(0);
+            event.getDrops().clear();
+            event.getDrops().add(ElementalItems.createFragmentElementalByType(ElementalType.AIR));
+            markDeath(ghast);
         }
     }
 
@@ -284,7 +285,7 @@ public class ElementalGhast implements Listener, ElementalMob {
 
     @Override
     public void showBossBar(Location location) {
-        this.bossBar.createBar(format("&3Elemental de Aire"), BarColor.WHITE, BarStyle.SOLID);
+        this.bossBar.createBar(format("&8Elemental de Aire"), BarColor.WHITE, BarStyle.SOLID);
         List<Player> nearby = Utils.getNearbyPlayers(location, 15.0);
         this.bossBar.addPlayers(nearby);
         nearby.forEach(p -> p.sendMessage(format("&cLa batalla ha comenzado...")));
@@ -301,7 +302,7 @@ public class ElementalGhast implements Listener, ElementalMob {
             Ghast ghast = (Ghast) entity;
             PersistentDataContainer data = ghast.getPersistentDataContainer();
             if (data.has(ghastKey, PersistentDataType.BYTE) && ghast.getCustomName() != null
-                    && ghast.getCustomName().contains("Elemental de Aire")) {
+                    && ghast.getCustomName().contains("Elemental Ghast")) {
                 return true;
             }
         }

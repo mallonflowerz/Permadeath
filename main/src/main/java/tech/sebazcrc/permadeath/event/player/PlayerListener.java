@@ -1,12 +1,11 @@
 package tech.sebazcrc.permadeath.event.player;
 
-import static tech.sebazcrc.permadeath.util.Utils.format;
+import static tech.sebazcrc.permadeath.util.TextUtils.format;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Skull;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.enchantments.Enchantment;
@@ -26,11 +25,11 @@ import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.Utils;
@@ -1003,15 +1002,15 @@ public class PlayerListener implements Listener {
         World world = spawnLocation.getWorld();
 
         if (type == ElementalType.EARTH) {
-            if (Main.getInstance().getElementalSpider().getIsDead()) {
+            if (Main.getInstance().getElementalGestion().getElementalSpider().getIsDead()) {
                 player.sendMessage(format("&eLa Elemental de Tierra ha muerto en &3")
-                        + Main.getInstance().getElementalSpider().getCoors());
+                        + Main.getInstance().getElementalGestion().getElementalSpider().getCoors());
                 return;
             }
-            boolean spawnSuccess = Main.getInstance().getElementalSpider().spawnElemental(spawnLocation);
+            boolean spawnSuccess = Main.getInstance().getElementalGestion().getElementalSpider().spawnElemental(spawnLocation);
             if (!spawnSuccess) {
                 player.sendMessage(format("&eYa está la Elemental de Tierra invocada en &3")
-                        + Main.getInstance().getElementalSpider().getCoors());
+                        + Main.getInstance().getElementalGestion().getElementalSpider().getCoors());
                 return;
             }
             // Ajustes de intensidad para partículas negras
@@ -1022,15 +1021,15 @@ public class PlayerListener implements Listener {
             Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 1.5F);
             world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, redDust);
         } else if (type == ElementalType.AIR) {
-            if (Main.getInstance().getElementalGhast().getIsDead()) {
+            if (Main.getInstance().getElementalGestion().getElementalGhast().getIsDead()) {
                 player.sendMessage(format("&eLa Elemental de Aire ha muerto en &3")
-                        + Main.getInstance().getElementalGhast().getCoors());
+                        + Main.getInstance().getElementalGestion().getElementalGhast().getCoors());
                 return;
             }
-            boolean spawnSuccess = Main.getInstance().getElementalGhast().spawnElemental(spawnLocation);
+            boolean spawnSuccess = Main.getInstance().getElementalGestion().getElementalGhast().spawnElemental(spawnLocation);
             if (!spawnSuccess) {
                 player.sendMessage(format("&eYa está la Elemental de Aire invocada en &3")
-                        + Main.getInstance().getElementalGhast().getCoors());
+                        + Main.getInstance().getElementalGestion().getElementalGhast().getCoors());
                 return;
             }
             // Ajustes de intensidad para partículas negras

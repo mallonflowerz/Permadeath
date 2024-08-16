@@ -59,7 +59,7 @@ public class DateManager {
 
         if (this.currentDate.isBefore(now)) {
             this.currentDate = now;
-            instance.getCraftingListener().resetLimitCraft();
+            instance.getElementalGestion().getCraftingListener().resetLimitCraft();
             DiscordPortal.onDayChange();
         }
     }

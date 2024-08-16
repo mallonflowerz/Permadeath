@@ -23,7 +23,7 @@ public class BarBoss {
     }
 
     public void createBar(String title, BarColor color, BarStyle style) {
-        this.bar = Bukkit.createBossBar(Utils.format(title), color, style);
+        this.bar = Bukkit.createBossBar(TextUtils.format(title), color, style);
         this.bar.setVisible(true);
     }
 

@@ -1,6 +1,6 @@
 package tech.sebazcrc.permadeath.util.mob.elementals;
 
-import static tech.sebazcrc.permadeath.util.Utils.format;
+import static tech.sebazcrc.permadeath.util.TextUtils.format;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +43,8 @@ import tech.sebazcrc.permadeath.Main;
 import tech.sebazcrc.permadeath.util.BarBoss;
 import tech.sebazcrc.permadeath.util.Utils;
 import tech.sebazcrc.permadeath.util.interfaces.ElementalMob;
+import tech.sebazcrc.permadeath.util.item.ElementalItems;
+import tech.sebazcrc.permadeath.util.lib.ElementalType;
 
 public class ElementalSpider implements Listener, ElementalMob {
 
@@ -232,6 +234,9 @@ public class ElementalSpider implements Listener, ElementalMob {
             return;
         if (isElemental(event.getEntity())) {
             Spider spider = (Spider) event.getEntity();
+            event.setDroppedExp(0);
+            event.getDrops().clear();
+            event.getDrops().add(ElementalItems.createFragmentElementalByType(ElementalType.EARTH));
             markDeath(spider);
         }
     }

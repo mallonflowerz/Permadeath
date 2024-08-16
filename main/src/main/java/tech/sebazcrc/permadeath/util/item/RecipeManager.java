@@ -10,8 +10,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import tech.sebazcrc.permadeath.Main;
-import tech.sebazcrc.permadeath.util.item.InfernalNetherite;
-import tech.sebazcrc.permadeath.util.item.PermadeathItems;
 import tech.sebazcrc.permadeath.util.lib.ItemBuilder;
 import tech.sebazcrc.permadeath.util.TextUtils;
 
@@ -51,6 +49,14 @@ public class RecipeManager {
             registerIE();
             registerLifeOrb();
             registerBeginningRelic();
+        } catch (IllegalStateException ex) {
+            // Ignorar, la receta fue registrada antes probablemente
+        }
+    }
+
+    public void registerD70Recipes() {
+        try {
+            registerElementalizador();
         } catch (IllegalStateException ex) {
             // Ignorar, la receta fue registrada antes probablemente
         }
@@ -139,6 +145,16 @@ public class RecipeManager {
         recipe.shape(" S ", " D ", " S ");
         recipe.setIngredient('S', Material.SHULKER_SHELL);
         recipe.setIngredient('D', Material.DIAMOND_BLOCK);
+        instance.getServer().addRecipe(recipe);
+    }
+
+    private void registerElementalizador() {
+        ItemStack s = ElementalItems.createElementalizador();
+
+        NamespacedKey key = new NamespacedKey(instance, "elementalizador");
+        ShapedRecipe recipe = new ShapedRecipe(key, s);
+        recipe.shape(" A ", "AAA", " A ");
+        recipe.setIngredient('A', Material.PINK_DYE);
         instance.getServer().addRecipe(recipe);
     }
 

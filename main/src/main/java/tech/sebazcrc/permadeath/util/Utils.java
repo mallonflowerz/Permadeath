@@ -2,7 +2,6 @@ package tech.sebazcrc.permadeath.util;
 
 import java.util.*;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -51,9 +50,5 @@ public class Utils {
             }
         }
         return players;
-    }
-
-    public static String format(String chain) {
-        return ChatColor.translateAlternateColorCodes('&', chain);
     }
 }

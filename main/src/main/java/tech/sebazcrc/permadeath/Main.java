@@ -38,6 +38,7 @@ import tech.sebazcrc.permadeath.end.EndManager;
 import tech.sebazcrc.permadeath.event.block.BlockListener;
 import tech.sebazcrc.permadeath.event.entity.EntityEvents;
 import tech.sebazcrc.permadeath.util.mob.CustomSkeletons;
+import tech.sebazcrc.permadeath.util.mob.elementals.ElementalGhast;
 import tech.sebazcrc.permadeath.util.mob.elementals.ElementalSpider;
 import tech.sebazcrc.permadeath.event.entity.SpawnListener;
 import tech.sebazcrc.permadeath.event.entity.TotemListener;
@@ -100,8 +101,10 @@ public final class Main extends JavaPlugin implements Listener {
     private ShellEvent shulkerEvent;
     private LifeOrbEvent orbEvent;
     private SpawnListener spawnListener;
+
     private CraftingListener craftingListener;
     private ElementalSpider elementalSpider;
+    private ElementalGhast elementalGhast;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null)
@@ -149,6 +152,9 @@ public final class Main extends JavaPlugin implements Listener {
         }
         if (this.elementalSpider != null) {
             this.elementalSpider.saveConfigElemental();
+        }
+        if (this.elementalGhast != null) {
+            this.elementalGhast.saveConfigElemental();
         }
 
         getConfig().set("DontTouch.PlayTime", this.playTime);
@@ -778,8 +784,10 @@ public final class Main extends JavaPlugin implements Listener {
         if (DateManager.getInstance().getDay() >= 70 && !registeredDays.get(70)) {
             this.craftingListener = new CraftingListener(this);
             this.elementalSpider = new ElementalSpider(this);
+            this.elementalGhast = new ElementalGhast(this);
             this.getServer().getPluginManager().registerEvents(this.craftingListener, this);
             this.getServer().getPluginManager().registerEvents(this.elementalSpider, this);
+            this.getServer().getPluginManager().registerEvents(this.elementalGhast, this);
             Bukkit.getConsoleSender()
                     .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b70"));
             registeredDays.replace(70, true);
@@ -1044,6 +1052,10 @@ public final class Main extends JavaPlugin implements Listener {
 
     public ElementalSpider getElementalSpider() {
         return this.elementalSpider;
+    }
+
+    public ElementalGhast getElementalGhast() {
+        return this.elementalGhast;
     }
 
     public boolean isSmallIslandsEnabled() {

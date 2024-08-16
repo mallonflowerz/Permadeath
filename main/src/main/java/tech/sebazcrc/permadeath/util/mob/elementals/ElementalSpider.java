@@ -77,7 +77,7 @@ public class ElementalSpider implements Listener, ElementalMob {
         spider.setHealth(MAX_HEALTH);
         spider.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(14.0);
         spider.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(32.0);
-        spider.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.7);
+        spider.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.4);
         spider.setCustomName(format("&2Elemental Spider"));
         spider.setCustomNameVisible(false);
         spider.getPersistentDataContainer().set(spiderKey, PersistentDataType.BYTE,
@@ -95,7 +95,6 @@ public class ElementalSpider implements Listener, ElementalMob {
         this.bossBar.createBar(format("&2Elemental de Tierra"), BarColor.GREEN, BarStyle.SOLID);
         List<Player> nearby = Utils.getNearbyPlayers(location, 15.0);
         this.bossBar.addPlayers(nearby);
-        this.bossBar.setProgress(MAX_HEALTH); 
         nearby.forEach(p -> p.sendMessage(format("&cLa batalla ha comenzado...")));
     }
 

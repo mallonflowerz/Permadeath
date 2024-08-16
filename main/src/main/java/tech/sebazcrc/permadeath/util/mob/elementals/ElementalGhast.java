@@ -5,6 +5,7 @@ import static tech.sebazcrc.permadeath.util.Utils.format;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -21,9 +22,11 @@ import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Spider;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -65,18 +68,24 @@ public class ElementalGhast implements Listener, ElementalMob {
 
     @Override
     public boolean spawnElemental(Location location) {
+        if (this.ghastActive || this.isDead)
+            return false;
         Ghast ghast = location.getWorld().spawn(location, Ghast.class);
         ghast.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(MAX_HEALTH);
         ghast.setHealth(MAX_HEALTH);
         ghast.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(1);
         ghast.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(0.4);
         ghast.getAttribute(Attribute.GENERIC_FOLLOW_RANGE).setBaseValue(120.0);
-        ghast.getAttribute(Attribute.GENERIC_FLYING_SPEED).setBaseValue(0.8);
+        // ghast.getAttribute(Attribute.GENERIC_FLYING_SPEED).setBaseValue(0.8);
         ghast.setCustomName(format("&bElemental Ghast"));
         ghast.setCustomNameVisible(false);
         ghast.getPersistentDataContainer().set(ghastKey, PersistentDataType.BYTE,
                 (byte) 1);
         ghast.setRemoveWhenFarAway(false);
+        showBossBar(location);
+        this.ghastActive = true;
+        this.coorsGhast = String.format("%s %s %s", location.getX(), location.getY(),
+                location.getZ());
         return true;
     }
 
@@ -250,10 +259,27 @@ public class ElementalGhast implements Listener, ElementalMob {
                 Ghast ghast = (Ghast) fireball.getShooter();
                 if (isElemental(ghast)) {
                     fireball.setYield((float) RANDOM.nextInt(100));
-                    
+
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onSpiderDeath(EntityDeathEvent event) {
+        if (this.isDead)
+            return;
+        if (isElemental(event.getEntity())) {
+            Ghast spider = (Ghast) event.getEntity();
+            markDeath(spider);
+        }
+    }
+
+    private void markDeath(Ghast ghast) {
+        confirmDeath();
+        hideBossBar();
+        Bukkit.getOnlinePlayers()
+                .forEach(p -> p.sendMessage(format("&eLa Elemental de Tierra ha muerto en &3") + this.coorsGhast));
     }
 
     @Override
@@ -261,7 +287,6 @@ public class ElementalGhast implements Listener, ElementalMob {
         this.bossBar.createBar(format("&3Elemental de Aire"), BarColor.WHITE, BarStyle.SOLID);
         List<Player> nearby = Utils.getNearbyPlayers(location, 15.0);
         this.bossBar.addPlayers(nearby);
-        this.bossBar.setProgress(MAX_HEALTH);
         nearby.forEach(p -> p.sendMessage(format("&cLa batalla ha comenzado...")));
     }
 
@@ -319,6 +344,14 @@ public class ElementalGhast implements Listener, ElementalMob {
             section.set("Coors", this.coorsGhast);
         }
         plugin.saveConfig();
+    }
+
+    public boolean getIsDead() {
+        return this.isDead;
+    }
+
+    public String getCoors() {
+        return this.coorsGhast;
     }
 
 }

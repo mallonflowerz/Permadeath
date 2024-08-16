@@ -1022,7 +1022,17 @@ public class PlayerListener implements Listener {
             Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 1.5F);
             world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, redDust);
         } else if (type == ElementalType.AIR) {
-            world.spawn(spawnLocation, Phantom.class);
+            if (Main.getInstance().getElementalGhast().getIsDead()) {
+                player.sendMessage(format("&eLa Elemental de Aire ha muerto en &3")
+                        + Main.getInstance().getElementalGhast().getCoors());
+                return;
+            }
+            boolean spawnSuccess = Main.getInstance().getElementalGhast().spawnElemental(spawnLocation);
+            if (!spawnSuccess) {
+                player.sendMessage(format("&eYa está la Elemental de Aire invocada en &3")
+                        + Main.getInstance().getElementalGhast().getCoors());
+                return;
+            }
             // Ajustes de intensidad para partículas negras
             Particle.DustOptions blackDust = new Particle.DustOptions(Color.BLACK, 1.5F);
             world.spawnParticle(Particle.REDSTONE, spawnLocation, 200, 0.5, 0.5, 0.5, blackDust);

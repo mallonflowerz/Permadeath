@@ -925,6 +925,21 @@ public class PlayerListener implements Listener {
                     }
                 }
             }
+
+            // Ajustar su velocidad
+            int currentLevel = e.getPlayer().getLevel();
+
+            int maxLevels = 30;
+            double minSpeed = 0.1;
+            double maxSpeed = 0.2;
+
+            int maxXp = Utils.getExperienceTotalFromLevels(maxLevels);
+            int currentXp = Utils.getExperienceTotalFromLevels(currentLevel);
+
+            double speedFactor = (double) currentXp / maxXp;
+            double newSpeed = Math.max(minSpeed, maxSpeed * (1 - speedFactor));
+
+            e.getPlayer().setWalkSpeed((float) newSpeed);
         }
     }
 

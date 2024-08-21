@@ -85,7 +85,7 @@ public class ElementalSpider implements Listener, ElementalMob {
         spider.getPersistentDataContainer().set(spiderKey, PersistentDataType.BYTE,
                 (byte) 1);
         spider.setRemoveWhenFarAway(false);
-        showBossBar(location);
+        // showBossBar(location);
         this.spiderActive = true;
         this.coorsSpider = String.format("%s %s %s", location.getX(), location.getY(),
                 location.getZ());

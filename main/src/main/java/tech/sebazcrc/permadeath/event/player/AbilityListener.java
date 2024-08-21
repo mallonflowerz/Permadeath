@@ -1,6 +1,7 @@
 package tech.sebazcrc.permadeath.event.player;
 
 import static org.bukkit.Bukkit.getServer;
+import static tech.sebazcrc.permadeath.util.TextUtils.format;
 
 import java.util.List;
 
@@ -12,7 +13,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -49,10 +49,16 @@ public class AbilityListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (this.ability != null || this.activeAbility != null || this.cooldownActive)
+        if (this.ability != null || this.activeAbility != null)
             return;
 
         Player p = e.getPlayer();
+
+        if (cooldownActive) {
+            p.sendMessage(format("&6El cooldown sigue activo, debes esperar 10 minutos."));
+            return;
+        }
+
         PotionEffect effect = new PotionEffect(PotionEffectType.HEALTH_BOOST, DURATION, 0);
 
         if (e.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -60,11 +66,11 @@ public class AbilityListener implements Listener {
             if (item != null && ElementalItems.isElementalizador(item)) {
                 this.activeAbility = ElementalType.AIR;
                 // SkillTimerRunnable.startSkillTimer(p, plugin, 300);
-                p.setAllowFlight(true);
                 p.addPotionEffect(effect);
                 this.ability = new BukkitRunnable() {
                     @Override
                     public void run() {
+                        p.setAllowFlight(true);
                         getServer().getWorlds().forEach(w -> w.setStorm(false));
                     }
                 }.runTaskTimer(plugin, 0, 20);
@@ -152,7 +158,8 @@ public class AbilityListener implements Listener {
 
                 Location targetLocation = target.getLocation();
 
-                target.getWorld().strikeLightning(targetLocation);
+                target.getWorld().strikeLightningEffect(targetLocation);
+                target.damage(5.0);
             }
         }
     }
@@ -233,9 +240,11 @@ public class AbilityListener implements Listener {
             if (this.activeAbility == ElementalType.ENERGY) {
                 if (event.getHitEntity() != null) {
                     Entity hitEntity = event.getHitEntity();
-                    if (hitEntity instanceof Mob) {
+                    if (hitEntity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) hitEntity;
                         Location hitLocation = hitEntity.getLocation();
-                        hitEntity.getWorld().strikeLightning(hitLocation);
+                        livingEntity.getWorld().strikeLightningEffect(hitLocation);
+                        livingEntity.damage(5.0);
                     }
                 }
             }
@@ -254,8 +263,10 @@ public class AbilityListener implements Listener {
                 List<Entity> nearbyEntities = player.getNearbyEntities(5, 5, 5);
 
                 for (Entity entity : nearbyEntities) {
-                    if (entity != player && entity.getType().isAlive()) {
-                        player.getWorld().strikeLightning(entity.getLocation());
+                    if (entity != player && entity.getType().isAlive() && entity instanceof LivingEntity) {
+                        LivingEntity livingEntity = (LivingEntity) entity;
+                        livingEntity.getWorld().strikeLightningEffect(entity.getLocation());
+                        livingEntity.damage(5.0);
                     }
                 }
             }

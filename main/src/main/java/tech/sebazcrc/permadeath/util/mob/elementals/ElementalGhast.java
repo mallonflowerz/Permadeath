@@ -81,7 +81,7 @@ public class ElementalGhast implements Listener, ElementalMob {
         ghast.getPersistentDataContainer().set(ghastKey, PersistentDataType.BYTE,
                 (byte) 1);
         ghast.setRemoveWhenFarAway(false);
-        showBossBar(location);
+        // showBossBar(location);
         this.ghastActive = true;
         this.coorsGhast = String.format("%s %s %s", location.getX(), location.getY(),
                 location.getZ());

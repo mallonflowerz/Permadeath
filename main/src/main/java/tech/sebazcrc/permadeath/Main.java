@@ -770,6 +770,7 @@ public final class Main extends JavaPlugin implements Listener {
 
         if (DateManager.getInstance().getDay() >= 70 && !registeredDays.get(70)) {
             this.elementalGestion = new ElementalGestion(this);
+            this.recipes.registerD70Recipes();
             Bukkit.getConsoleSender()
                     .sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b70"));
             registeredDays.replace(70, true);

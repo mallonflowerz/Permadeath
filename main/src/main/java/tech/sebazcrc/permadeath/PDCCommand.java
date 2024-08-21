@@ -668,6 +668,16 @@ public class PDCCommand implements CommandExecutor {
 
                         p.sendMessage(TextUtils.format("&eHas recibido los Elemental Eggs (comprueba no tener el inventario lleno)"));
 
+                    } else if (s.toLowerCase().equalsIgnoreCase("elementalFrag")) {
+
+                        p.getInventory().addItem(ElementalItems.createFragmentElementalByType(ElementalType.AIR));
+                        p.getInventory().addItem(ElementalItems.createFragmentElementalByType(ElementalType.EARTH));
+                        p.getInventory().addItem(ElementalItems.createFragmentElementalByType(ElementalType.ENERGY));
+                        p.getInventory().addItem(ElementalItems.createFragmentElementalByType(ElementalType.FIRE));
+                        p.getInventory().addItem(ElementalItems.createFragmentElementalByType(ElementalType.WATER));
+
+                        p.sendMessage(TextUtils.format("&eHas recibido los Elemental Fragments (comprueba no tener el inventario lleno)"));
+
                     } else {
 
                         p.sendMessage(TextUtils.format("&ePor favor introduce el ítem deseado"));

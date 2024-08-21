@@ -103,9 +103,9 @@ public class ElementalItems {
         ItemMeta meta = s.getItemMeta();
         meta.setUnbreakable(true);
         meta.setLore(Arrays.asList(
-                "&4Tienes en tu poder una serie de habilidades grandiosas",
-                "&8Cooldown: 5 minutos &3(solo se puede activar una habilidad a la vez)",
-                "&eModo de activación: &7Aire &9|| &bAgua &9|| &2Tierra &9|| &6Fuego &9=> &e(Click derecho) &9// &3Energía &9=> &e(Click izquierdo)"));
+                TextUtils.format("&4¡¡Tienes en tu poder una serie de habilidades grandiosas!!"),
+                TextUtils.format("&8Cooldown: 5 minutos"),
+                TextUtils.format("&3Solo se puede activar una habilidad a la vez!")));
         s.setItemMeta(meta);
 
         return s;
@@ -114,11 +114,11 @@ public class ElementalItems {
     public static boolean isElementalizador(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
 
-        if (meta.isUnbreakable() && meta.hasLore() && meta.hasDisplayName()
-                && meta.getDisplayName().contains("Elementalizador")
+        if (meta != null && meta.isUnbreakable() && meta.hasLore() && meta.hasDisplayName()
                 && item.isSimilar(createElementalizador()) && meta.hasCustomModelData()) {
             return true;
         }
+        System.out.println("NO ES XD ");
         return false;
     }
 

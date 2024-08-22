@@ -1,6 +1,5 @@
 package tech.sebazcrc.permadeath.event.player;
 
-import static org.bukkit.Bukkit.getServer;
 import static tech.sebazcrc.permadeath.util.TextUtils.format;
 
 import java.util.List;
@@ -53,6 +52,10 @@ public class AbilityListener implements Listener {
             return;
 
         Player p = e.getPlayer();
+        ItemStack item = p.getInventory().getItemInMainHand();
+
+        if (item == null || !ElementalItems.isElementalizador(item))
+            return;
 
         if (cooldownActive) {
             p.sendMessage(format("&6El cooldown sigue activo, debes esperar 10 minutos."));
@@ -62,56 +65,48 @@ public class AbilityListener implements Listener {
         PotionEffect effect = new PotionEffect(PotionEffectType.HEALTH_BOOST, DURATION, 0);
 
         if (e.getAction() == Action.RIGHT_CLICK_AIR) {
-            ItemStack item = p.getInventory().getItemInMainHand();
-            if (item != null && ElementalItems.isElementalizador(item)) {
-                this.activeAbility = ElementalType.AIR;
-                // SkillTimerRunnable.startSkillTimer(p, plugin, 300);
+            this.activeAbility = ElementalType.AIR;
+            p.sendMessage(format("La habilidad de &7Aire ha sido activada."));
+            // SkillTimerRunnable.startSkillTimer(p, plugin, 300);
+            p.addPotionEffect(effect);
+            this.ability = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    p.setAllowFlight(true);
+                    plugin.getServer().getWorlds().forEach(w -> w.setStorm(false));
+                }
+            }.runTaskTimer(plugin, 0, 20);
+        }
+
+        if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
+            this.activeAbility = ElementalType.ENERGY;
+            p.sendMessage(format("&3La habilidad de &bEnergía ha sido activada."));
+            p.addPotionEffect(effect);
+        }
+
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (isTypeDirt(e.getClickedBlock().getType())) {
+                this.activeAbility = ElementalType.EARTH;
+                p.sendMessage(format("&2La habilidad de &aTierra ha sido activada."));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, DURATION, 1));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, DURATION, 2));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, DURATION, 5));
+                p.addPotionEffect(effect);
+            } else if (e.getClickedBlock().getType() == Material.WATER) {
+                this.activeAbility = ElementalType.WATER;
+                p.sendMessage(format("&bLa habilidad de &9Agua ha sido activada."));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, DURATION, 1));
                 p.addPotionEffect(effect);
                 this.ability = new BukkitRunnable() {
                     @Override
                     public void run() {
-                        p.setAllowFlight(true);
-                        getServer().getWorlds().forEach(w -> w.setStorm(false));
+                        p.setRemainingAir(300);
                     }
                 }.runTaskTimer(plugin, 0, 20);
-            }
-        }
-
-        if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
-            ItemStack item = p.getInventory().getItemInMainHand();
-            if (item != null && ElementalItems.isElementalizador(item)) {
-                this.activeAbility = ElementalType.ENERGY;
-
+            } else if (e.getClickedBlock().getType() == Material.LAVA) {
+                this.activeAbility = ElementalType.FIRE;
+                p.sendMessage(format("&eLa habilidad de &6Fuego ha sido activada."));
                 p.addPotionEffect(effect);
-            }
-        }
-
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            ItemStack item = p.getInventory().getItemInMainHand();
-            if (item != null && ElementalItems.isElementalizador(item)) {
-                if (isTypeDirt(e.getClickedBlock().getType())) {
-                    this.activeAbility = ElementalType.EARTH;
-
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, DURATION, 1));
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, DURATION, 2));
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, DURATION, 5));
-                    p.addPotionEffect(effect);
-                } else if (e.getClickedBlock().getType() == Material.WATER) {
-                    this.activeAbility = ElementalType.WATER;
-
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.DOLPHINS_GRACE, DURATION, 1));
-                    p.addPotionEffect(effect);
-                    this.ability = new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            p.setRemainingAir(300);
-                        }
-                    }.runTaskTimer(plugin, 0, 20);
-                } else if (e.getClickedBlock().getType() == Material.LAVA) {
-                    this.activeAbility = ElementalType.FIRE;
-
-                    p.addPotionEffect(effect);
-                }
             }
         }
 
@@ -274,7 +269,7 @@ public class AbilityListener implements Listener {
     }
 
     private void placeWebsAround(Location location) {
-        int radius = 1;
+        int radius = 5;
 
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
